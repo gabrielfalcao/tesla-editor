@@ -1,0 +1,77 @@
+{
+  "name": "tesla-editor",
+  "author": "Gabriel Falcão",
+  "description": "monaco editor in react in electron",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-webpack dev",
+    "start": "electron-webpack dev",
+    "compile": "electron-webpack",
+    "dist": "yarn compile && electron-builder",
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+  },
+  "dependencies": {
+    "@emotion/css": "^11.5.0",
+    "@emotion/react": "^11.5.0",
+    "@emotion/styled": "^11.3.0",
+    "@popperjs/core": "^2.10.2",
+    "bootstrap": "^5.1.3",
+    "core-js": "3",
+    "monaco-editor": "0.30.1",
+    "react": "^17.0.2",
+    "react-bootstrap": "^2.0.2",
+    "react-dom": "^17.0.2",
+    "react-folder-tree": "^5.0.3",
+    "react-router": "^6.0.2",
+    "react-router-dom": "^6.0.2",
+    "source-map-support": "^0.5.16"
+  },
+  "resolutions": {
+    "react": "17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/eslint-parser": "^7.16.3",
+    "@babel/preset-react": "^7.16.0",
+    "babel-loader": "^8.2.3",
+    "copy-webpack-plugin": "^6.3.2",
+    "electron": "8.2.0",
+    "electron-builder": "^22.4.1",
+    "electron-webpack": "^2.8.2",
+    "eslint": "^8.2.0",
+    "eslint-plugin-react": "^7.27.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "monaco-editor-webpack-plugin": "^6.0.0",
+    "webpack": "^4.42.1",
+    "write-file-webpack-plugin": "^4.5.1"
+  },
+  "electronWebpack": {
+    "whiteListedModules": ["monaco-editor"],
+    "main": {
+      "webpackConfig": "webpack.main.config.js"
+    },
+    "renderer": {
+      "webpackConfig": "webpack.renderer.config.js"
+    }
+  },
+  "build": {
+    "appId": "it.falcao.tesla-editor",
+    "productName": "TeslaEditor",
+    "copyright": "Copyright © 2021 Gabriel Falcao",
+    "mac": {
+      "icon": "./public/app.png",
+      "category": "public.app-category.utilities"
+    },
+    "files": [
+      "./build/**/*",
+      "./dist/**/*",
+      "./node_modules/**/*",
+      "./public/**/*",
+      "*.js"
+    ],
+    "directories": {
+      "buildResources": "public"
+    }
+  }
+}
