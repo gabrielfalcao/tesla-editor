@@ -20,7 +20,7 @@ const dropdownStyle = {
   color: "white",
   position: "absolute",
   right: "0",
-  margin: "0.5rem 2rem 0 0"
+  margin: "0.5rem 2rem 0 0",
 };
 const knownFiles = [
   "~/.bashrc",
@@ -32,7 +32,7 @@ const knownFiles = [
   "~/.pypirc",
   "~/.yarnrc",
   "~/.ackrc",
-  "~/.docker/config.json"
+  "~/.docker/config.json",
 ];
 const languages = [
   "json",
@@ -43,7 +43,7 @@ const languages = [
   "python",
   "rust",
   "ruby",
-  "markdown"
+  "markdown",
 ];
 export default function TopBar({ filename, language, setLanguage, dirty }) {
   return (
@@ -52,7 +52,7 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav>
             <NavDropdown title={<FileCode />}>
-              {knownFiles.map(filename => (
+              {knownFiles.map((filename) => (
                 <NavDropdown.Item
                   key={filename}
                   onClick={() => {
@@ -77,12 +77,12 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
               <select
                 style={dropdownStyle}
                 value={language}
-                onChange={event => {
+                onChange={(event) => {
                   const lang = event.target.value;
                   setLanguage(lang);
                 }}
               >
-                {languages.map(value => (
+                {languages.map((value) => (
                   <option key={value} value={value}>
                     {value}
                   </option>
@@ -96,7 +96,7 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
                 fontSize: "1rem",
                 fontWeight: "normal",
                 fontStyle: dirty ? "italic" : "normal",
-                color: dirty ? "tan" : "#fff"
+                color: dirty ? "tan" : "#fff",
               }}
             >
               {dirty ? "*" : null}

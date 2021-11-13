@@ -8,6 +8,11 @@ const { dependencies } = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, "package.json"))
 );
 
+
+
+
+
+
 const srcPath = path.resolve(__dirname, "src");
 const PRODUCTION = process.env.NODE_ENV === "production";
 const monacoPath = path.resolve(__dirname, "node_modules/monaco-editor/min");

@@ -8,7 +8,7 @@ const {
   MenuItem,
   nativeImage,
   BrowserWindow,
-  ipcMain
+  ipcMain,
 } = require("electron");
 
 import * as path from "path";
@@ -28,8 +28,8 @@ function createMainWindow() {
     height: 960,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
-    }
+      enableRemoteModule: true,
+    },
   });
 
   if (isDevelopment) {
@@ -43,7 +43,7 @@ function createMainWindow() {
       formatUrl({
         pathname: path.join(__dirname, "index.html"),
         protocol: "file",
-        slashes: true
+        slashes: true,
       })
     );
   }
@@ -81,12 +81,12 @@ app.on("activate", () => {
 app.on("ready", () => {
   mainWindow = createMainWindow();
 });
-app.on("will-quit", event => {
+app.on("will-quit", (event) => {
   if (
     dialog.showMessageBoxSync(mainWindow, {
       type: "question",
       message: "Are you sure you want to quit?",
-      buttons: ["Yes", "No"]
+      buttons: ["Yes", "No"],
     }) === 1
   ) {
     event.preventDefault();
@@ -134,7 +134,7 @@ function resolveHome(filepath) {
 
 function writeFile(filename, content) {
   const bytes = fs.writeFileSync(resolveHome(filename), content, {
-    encoding: "utf-8"
+    encoding: "utf-8",
   });
   console.log(`wrote ${filename}: ${bytes}`);
   mainWindow.webContents.send("file-written", { content, filename, bytes });
@@ -144,7 +144,7 @@ function loadFileIntoRenderer(filename) {
   const content = fs.readFileSync(resolveHome(filename), "utf-8");
   mainWindow.webContents.send("file-loaded", {
     content,
-    filename
+    filename,
   });
 }
 ipcMain.on("read-file", (event, filename) => {
@@ -164,12 +164,22 @@ menu.append(
     label: "Tesla Editor",
     submenu: [
       {
+        role: "new",
+        label: "new",
+        accelerator: process.platform === "darwin" ? "Cmd+N" : "Ctrl+N",
+        click: () => {
+          if (!mainWindow) {
+            mainWindow = createMainWindow();
+          }
+        },
+      },
+      {
         role: "save",
         label: "Save",
         accelerator: process.platform === "darwin" ? "Cmd+S" : "Ctrl+S",
         click: () => {
           mainWindow.webContents.send("save-file");
-        }
+        },
       },
       {
         role: "open",
@@ -180,19 +190,24 @@ menu.append(
             title: "Open a file",
             message: "binary files are not supported",
             defaultPath: path.resolve(__dirname, "../.."),
-            properties: ["openFile"]
+            properties: ["openFile"],
           });
           if (filename) {
             loadFileIntoRenderer(filename);
           }
-        }
+        },
+      },
+      {
+        role: "close",
+        label: "Close",
+        accelerator: process.platform === "darwin" ? "Cmd+W" : "Ctrl+W",
       },
       {
         role: "quit",
         label: "Quit",
-        accelerator: process.platform === "darwin" ? "Cmd+Q" : "Alt+F4"
-      }
-    ]
+        accelerator: process.platform === "darwin" ? "Cmd+Q" : "Alt+F4",
+      },
+    ],
   })
 );
 

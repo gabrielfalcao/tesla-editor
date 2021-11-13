@@ -6,12 +6,12 @@ const editorStyle = {
   minWidth: "100%",
   height: "100%",
   position: "relative",
-  marginTop: "56px"
+  marginTop: "56px",
 };
 const containerStyle = {
   minWidth: "100%",
   height: "100%",
-  position: "absolute"
+  position: "absolute",
 };
 export const defaultOptions = {
   theme: "vs-dark",
@@ -21,7 +21,7 @@ export const defaultOptions = {
   width: "100%",
   value: undefined,
   setDirty: () => {},
-  dirty: undefined
+  dirty: undefined,
 };
 export default function Editor({
   setLanguage,
@@ -45,19 +45,19 @@ export default function Editor({
       "editor.lineHighlightBackground": "#0000FF20",
       "editorLineNumber.foreground": "#008800",
       "editor.selectionBackground": "#88000030",
-      "editor.inactiveSelectionBackground": "#88000015"
-    }
+      "editor.inactiveSelectionBackground": "#88000015",
+    },
   });
   //monaco.editor.setTheme("myTheme");
-  const loadEditor = current => {
-    const container = document.getElementById("editor");
+  const loadEditor = (current) => {
+    const container = document.getElementById("e80dd5");
     container.innerHTML = "";
     const editor =
       current ||
       monaco.editor.create(container, {
         ...defaultOptions,
         ...options,
-        value: undefined
+        value: undefined,
       });
 
     if (options.value) {
@@ -69,14 +69,14 @@ export default function Editor({
       );
 
       editor.setModel(model);
-      editor.getModel().onDidChangeContent(event => {
+      editor.getModel().onDidChangeContent((event) => {
         const newValue = editor.getModel().getValue();
         const hasChanged = newValue !== options.value;
         if (hasChanged) {
           if (!dirty) {
             setDirty(true);
+            editor.focus();
           }
-          editor.focus();
         }
       });
       setEditor(editor);
@@ -86,19 +86,19 @@ export default function Editor({
   useEffect(() => {
     if (!editor) {
       loadEditor();
-      window.addEventListener("resize", () => loadEditor());
     } else {
       if (!editor.getModel().uri.path.match(options.filename)) {
         loadEditor(editor);
       }
+      window.addEventListener("resize", () => loadEditor(editor));
     }
   });
-  ipcRenderer.on("save-file", (event, arg) => {
+  ipcRenderer.once("save-file", (event, arg) => {
     if (editor && dirty) {
       const model = editor.getModel();
       const code = {
         filename: model.uri.path,
-        content: model.getValue()
+        content: model.getValue(),
       };
       console.log("requesting to write file", code);
       ipcRenderer.send("write-code", code);
@@ -107,7 +107,7 @@ export default function Editor({
 
   return (
     <div style={containerStyle}>
-      <div style={editorStyle} id="editor" />
+      <div style={editorStyle} id="e80dd5" />
     </div>
   );
 }

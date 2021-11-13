@@ -4,6 +4,7 @@ module.exports = {
     plugins: [
         // ...
         "react-hooks",
+        'prettier'
     ],
     rules: {
         // ...
@@ -11,6 +12,7 @@ module.exports = {
         "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
         "no-unused-vars": "warn",
         "react/prop-types": "off",
+        "prettier/prettier": "error",
     },
     overrides: [
         {

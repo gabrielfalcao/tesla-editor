@@ -12,7 +12,7 @@ const statusBarStyle = {
   height: "32px",
   fontSize: "12px",
   padding: "1px",
-  margin: "0px"
+  margin: "0px",
 };
 export default function StatusBar({ filename }) {
   if (!filename) {
