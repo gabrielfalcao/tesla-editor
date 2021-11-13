@@ -23,6 +23,7 @@ export const defaultOptions = {
   setDirty: () => {},
   dirty: undefined,
 };
+
 export default function Editor({
   setLanguage,
   language,
@@ -33,7 +34,7 @@ export default function Editor({
   const [editor, setEditor] = useState(null);
 
   const loadEditor = (current) => {
-    const container = document.getElementById("e80dd5");
+    const container = document.getElementById("monaco-parent");
     container.innerHTML = "";
     const editor =
       current ||
@@ -93,7 +94,7 @@ export default function Editor({
 
   return (
     <div style={containerStyle}>
-      <div style={editorStyle} id="e80dd5" />
+      <div style={editorStyle} id="monaco-parent" />
     </div>
   );
 }

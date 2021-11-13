@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { ipcRenderer } from "electron";
-//import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import TopBar from "./TopBar";
 import Editor from "./Editor";

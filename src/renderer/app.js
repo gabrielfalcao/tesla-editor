@@ -1,9 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import MainScreen from "./MainScreen";
-import { showError } from "./Error";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "font-awesome/css/font-awesome.min.css";
+import { showError } from "./util";
 
 function render() {
   const root = document.getElementById("app");
