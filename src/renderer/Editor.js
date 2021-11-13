@@ -1,32 +1,38 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { ipcRenderer } from "electron";
 import * as monaco from "monaco-editor";
-
-/* theme="vs-dark"
- * height={400}
- * language={"shell"}
- * value={code.content || "#!/usr/bin/env bash\n"}
- *  */
 
 const editorStyle = {
   minWidth: "100%",
   height: "100%",
-  position: "absolute"
+  position: "relative",
+  marginTop: "56px"
 };
 const containerStyle = {
+  minWidth: "100%",
+  height: "100%",
   position: "absolute"
 };
 export const defaultOptions = {
   theme: "vs-dark",
   height: "100%",
   fontSize: "18px",
+  scrollBeyondLastLine: false,
   width: "100%",
-  value: undefined
+  value: undefined,
+  setDirty: () => {},
+  dirty: undefined
 };
-export default function Editor(options = defaultOptions) {
+export default function Editor({
+  setLanguage,
+  setDirty,
+  dirty,
+  ...options
+} = defaultOptions) {
   const element = useRef(null);
   const [editor, setEditor] = useState(null);
-  const [language, setLanguage] = useState(options.language);
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(options.value);
+  const [filename, setFilename] = useState(options.filename);
 
   monaco.editor.defineTheme("myTheme", {
     base: "vs",
@@ -42,42 +48,66 @@ export default function Editor(options = defaultOptions) {
       "editor.inactiveSelectionBackground": "#88000015"
     }
   });
-  monaco.editor.setTheme("myTheme");
-  const loadEditor = params => {
-    const editor = document.getElementById("main-editor");
-    editor.innerHTML = "";
-    monaco.editor.create(editor, {
-      ...params
-    });
-  };
-  useEffect(
-    () => {
-      if (value !== options.value) {
-        loadEditor({
-          ...defaultOptions,
-          ...options
-        });
-        setValue(options.value);
-      }
-      if (language !== options.language) {
-        setLanguage(options.language);
-        loadEditor({
-          ...defaultOptions,
-          ...options
-        });
-      } else {
-        console.log({ language, value });
-      }
-    },
-    [defaultOptions, options]
-  );
-  /* useEffect(
-   *   () => {
-   *     if (editor && value) {
-   *     }
-   *   },
-   *   [editor, value]
-   * ); */
+  //monaco.editor.setTheme("myTheme");
+  const loadEditor = current => {
+    const container = document.getElementById("editor");
+    container.innerHTML = "";
+    const editor =
+      current ||
+      monaco.editor.create(container, {
+        ...defaultOptions,
+        ...options,
+        value: undefined
+      });
 
-  return <div style={editorStyle} id="main-editor" />;
+    if (options.value) {
+      editor.getModel().dispose();
+      const model = monaco.editor.createModel(
+        options.value,
+        undefined, // language
+        monaco.Uri.file(options.filename) // uri
+      );
+
+      editor.setModel(model);
+      editor.getModel().onDidChangeContent(event => {
+        const newValue = editor.getModel().getValue();
+        const hasChanged = newValue !== options.value;
+        if (hasChanged) {
+          if (!dirty) {
+            setDirty(true);
+          }
+          editor.focus();
+        }
+      });
+      setEditor(editor);
+      setLanguage(model.getLanguageId());
+    }
+  };
+  useEffect(() => {
+    if (!editor) {
+      loadEditor();
+      window.addEventListener("resize", () => loadEditor());
+    } else {
+      if (!editor.getModel().uri.path.match(options.filename)) {
+        loadEditor(editor);
+      }
+    }
+  });
+  ipcRenderer.on("save-file", (event, arg) => {
+    if (editor && dirty) {
+      const model = editor.getModel();
+      const code = {
+        filename: model.uri.path,
+        content: model.getValue()
+      };
+      console.log("requesting to write file", code);
+      ipcRenderer.send("write-code", code);
+    }
+  });
+
+  return (
+    <div style={containerStyle}>
+      <div style={editorStyle} id="editor" />
+    </div>
+  );
 }

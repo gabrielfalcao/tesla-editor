@@ -4,6 +4,8 @@ const {
   app,
   Tray,
   Menu,
+  dialog,
+  MenuItem,
   nativeImage,
   BrowserWindow,
   ipcMain
@@ -11,6 +13,7 @@ const {
 
 import * as path from "path";
 import * as fs from "fs";
+import * as os from "os";
 import { format as formatUrl } from "url";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -78,7 +81,18 @@ app.on("activate", () => {
 app.on("ready", () => {
   mainWindow = createMainWindow();
 });
-
+app.on("will-quit", event => {
+  if (
+    dialog.showMessageBoxSync(mainWindow, {
+      type: "question",
+      message: "Are you sure you want to quit?",
+      buttons: ["Yes", "No"]
+    }) === 1
+  ) {
+    event.preventDefault();
+    mainWindow = createMainWindow();
+  }
+});
 /* app.on("ready", () => {
  *   const icon = nativeImage.createFromPath(path.resolve(__dirname, "tray.png"));
  *
@@ -118,14 +132,68 @@ function resolveHome(filepath) {
   return path.resolve(filepath);
 }
 
-function loadFileIntoRenderer(event, filename) {
+function writeFile(filename, content) {
+  const bytes = fs.writeFileSync(resolveHome(filename), content, {
+    encoding: "utf-8"
+  });
+  console.log(`wrote ${filename}: ${bytes}`);
+  mainWindow.webContents.send("file-written", { content, filename, bytes });
+}
+
+function loadFileIntoRenderer(filename) {
   const content = fs.readFileSync(resolveHome(filename), "utf-8");
-  event.reply("file-loaded", { content, filename });
+  mainWindow.webContents.send("file-loaded", {
+    content,
+    filename
+  });
 }
 ipcMain.on("read-file", (event, filename) => {
-  loadFileIntoRenderer(event, filename);
+  loadFileIntoRenderer(filename);
+});
+ipcMain.on("write-code", (event, { filename, content }) => {
+  writeFile(filename, content);
 });
 
 ipcMain.on("quit", (event, filename) => {
   process.exit(0);
 });
+
+const menu = new Menu();
+menu.append(
+  new MenuItem({
+    label: "Tesla Editor",
+    submenu: [
+      {
+        role: "save",
+        label: "Save",
+        accelerator: process.platform === "darwin" ? "Cmd+S" : "Ctrl+S",
+        click: () => {
+          mainWindow.webContents.send("save-file");
+        }
+      },
+      {
+        role: "open",
+        label: "Open",
+        accelerator: process.platform === "darwin" ? "Cmd+O" : "Ctrl+O",
+        click: () => {
+          const [filename] = dialog.showOpenDialogSync(mainWindow, {
+            title: "Open a file",
+            message: "binary files are not supported",
+            defaultPath: path.resolve(__dirname, "../.."),
+            properties: ["openFile"]
+          });
+          if (filename) {
+            loadFileIntoRenderer(filename);
+          }
+        }
+      },
+      {
+        role: "quit",
+        label: "Quit",
+        accelerator: process.platform === "darwin" ? "Cmd+Q" : "Alt+F4"
+      }
+    ]
+  })
+);
+
+Menu.setApplicationMenu(menu);

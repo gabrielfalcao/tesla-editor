@@ -15,11 +15,12 @@ import Editor from "./Editor";
 const defaultCode = {
   filename: undefined,
   content: undefined,
-  language: "shell"
+  language: undefined
 };
 
 export default function MainScreen() {
   const [language, setLanguage] = useState("shell");
+  const [dirty, setDirty] = useState(false);
 
   /* useEffect(() => {
    *     if (monaco) {
@@ -31,17 +32,26 @@ export default function MainScreen() {
   ipcRenderer.on("file-loaded", (_, arg) => {
     setCode(arg);
   });
-  const MainEditor = () => (
-    <Editor theme="vs-dark" language={language} value={code.content} />
-  );
+  ipcRenderer.on("file-written", (_, arg) => {
+    setDirty(false);
+  });
+
   return (
     <>
       <TopBar
         filename={code.filename}
         language={language}
         setLanguage={setLanguage}
+        dirty={dirty}
       />
-      <MainEditor />
+      <Editor
+        setLanguage={setLanguage}
+        filename={code.filename}
+        language={language}
+        value={code.content}
+        dirty={dirty}
+        setDirty={setDirty}
+      />
     </>
   );
 }

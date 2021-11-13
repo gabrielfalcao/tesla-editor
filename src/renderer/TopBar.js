@@ -1,3 +1,4 @@
+import * as path from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,7 +10,9 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { ipcRenderer } from "electron";
+import { FileCode } from "react-bootstrap-icons";
 
+//green: "#d5ce6d"
 const dropdownStyle = {
   border: "none",
   background: "#333",
@@ -42,13 +45,13 @@ const languages = [
   "ruby",
   "markdown"
 ];
-export default function TopBar({ filename, language, setLanguage }) {
+export default function TopBar({ filename, language, setLanguage, dirty }) {
   return (
     <Navbar bg="dark" variant="dark" expand="sm" fixed="top">
       <Container fluid>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav>
-            <NavDropdown title="menu">
+            <NavDropdown title={<FileCode />}>
               {knownFiles.map(filename => (
                 <NavDropdown.Item
                   key={filename}
@@ -73,10 +76,9 @@ export default function TopBar({ filename, language, setLanguage }) {
             <Nav.Item>
               <select
                 style={dropdownStyle}
-                defaultValue={language}
+                value={language}
                 onChange={event => {
                   const lang = event.target.value;
-                  console.warn({ lang });
                   setLanguage(lang);
                 }}
               >
@@ -88,7 +90,19 @@ export default function TopBar({ filename, language, setLanguage }) {
               </select>
             </Nav.Item>
           </Nav>
-          {filename ? <Navbar.Brand>{filename}</Navbar.Brand> : null}
+          {filename ? (
+            <Navbar.Brand
+              style={{
+                fontSize: "1rem",
+                fontWeight: "normal",
+                fontStyle: dirty ? "italic" : "normal",
+                color: dirty ? "tan" : "#fff"
+              }}
+            >
+              {dirty ? "*" : null}
+              {filename}
+            </Navbar.Brand>
+          ) : null}
         </Navbar.Collapse>
       </Container>
     </Navbar>
