@@ -6,7 +6,7 @@ const editorStyle = {
   minWidth: "100%",
   height: "100%",
   position: "relative",
-  marginTop: "56px",
+  marginTop: "64px",
 };
 const containerStyle = {
   minWidth: "100%",

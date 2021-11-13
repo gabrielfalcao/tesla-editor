@@ -5,7 +5,9 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
 import { ipcRenderer } from "electron";
-import { FileCode } from "react-bootstrap-icons";
+//import { FileCode } from "react-bootstrap-icons";
+import appIcon from "app.png";
+import { basicLanguages, knownFiles } from "./constants";
 
 //green: "#d5ce6d"
 const dropdownStyle = {
@@ -17,36 +19,20 @@ const dropdownStyle = {
   right: "0",
   margin: "0.5rem 2rem 0 0",
 };
-const knownFiles = [
-  "~/.bashrc",
-  "~/.bash_history",
-  "~/.gitconfig",
-  "~/.npmrc",
-  "~/.vimrc",
-  "~/.emacs.d/init.el",
-  "~/.pypirc",
-  "~/.yarnrc",
-  "~/.ackrc",
-  "~/.docker/config.json",
-];
-const languages = [
-  "json",
-  "javascript",
-  "typescript",
-  "shell",
-  "ini",
-  "python",
-  "rust",
-  "ruby",
-  "markdown",
-];
+
 export default function TopBar({ filename, language, setLanguage, dirty }) {
   return (
     <Navbar bg="dark" variant="dark" expand="sm" fixed="top">
       <Container fluid>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav>
-            <NavDropdown title={<FileCode />}>
+            <NavDropdown
+              title={
+                <>
+                  <img src={appIcon} width="32" height="32" /> Tesla Editor
+                </>
+              }
+            >
               {knownFiles.map((filename) => (
                 <NavDropdown.Item
                   key={filename}
@@ -77,7 +63,7 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
                   setLanguage(lang);
                 }}
               >
-                {languages.map((value) => (
+                {basicLanguages.map((value) => (
                   <option key={value} value={value}>
                     {value}
                   </option>

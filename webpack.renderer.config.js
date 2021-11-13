@@ -35,6 +35,10 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
     modules: [srcPath, "node_modules"],
+    alias: {
+      "tray.png": path.resolve(__dirname, "public/tray.png"),
+      "app.png": path.resolve(__dirname, "public/app.png"),
+    },
   },
   devtool: "inline-source-map",
   plugins: [
