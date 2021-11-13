@@ -48,7 +48,7 @@ export default function Editor({
       editor.getModel().dispose();
       const model = monaco.editor.createModel(
         options.value,
-        language, // language
+        undefined, // language
         monaco.Uri.file(options.filename) // uri
       );
       const detectedLanguage = model.getLanguageId();
