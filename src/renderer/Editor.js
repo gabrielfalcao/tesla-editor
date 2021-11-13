@@ -25,27 +25,13 @@ export const defaultOptions = {
 };
 export default function Editor({
   setLanguage,
+  language,
   setDirty,
   dirty,
   ...options
 } = defaultOptions) {
   const [editor, setEditor] = useState(null);
 
-  monaco.editor.defineTheme("myTheme", {
-    base: "vs",
-    inherit: true,
-    rules: [{ background: "EDF9FA" }],
-    colors: {
-      "editor.foreground": "#000000",
-      "editor.background": "#EDF9FA",
-      "editorCursor.foreground": "#8B0000",
-      "editor.lineHighlightBackground": "#0000FF20",
-      "editorLineNumber.foreground": "#008800",
-      "editor.selectionBackground": "#88000030",
-      "editor.inactiveSelectionBackground": "#88000015",
-    },
-  });
-  //monaco.editor.setTheme("myTheme");
   const loadEditor = (current) => {
     const container = document.getElementById("e80dd5");
     container.innerHTML = "";
@@ -54,6 +40,7 @@ export default function Editor({
       monaco.editor.create(container, {
         ...defaultOptions,
         ...options,
+        language,
         value: undefined,
       });
 
@@ -61,13 +48,13 @@ export default function Editor({
       editor.getModel().dispose();
       const model = monaco.editor.createModel(
         options.value,
-        undefined, // language
+        language, // language
         monaco.Uri.file(options.filename) // uri
       );
-
+      const detectedLanguage = model.getLanguageId();
       editor.setModel(model);
-      editor.getModel().onDidChangeContent(() => {
-        const newValue = editor.getModel().getValue();
+      model.onDidChangeContent(() => {
+        const newValue = model.getValue();
         const hasChanged = newValue !== options.value;
         if (hasChanged) {
           if (!dirty) {
@@ -77,7 +64,9 @@ export default function Editor({
         }
       });
       setEditor(editor);
-      setLanguage(model.getLanguageId());
+      if (detectedLanguage) {
+        setLanguage(detectedLanguage);
+      }
     }
   };
   useEffect(() => {

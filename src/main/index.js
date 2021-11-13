@@ -17,6 +17,9 @@ import * as fs from "fs";
 import { format as formatUrl } from "url";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
+const trayIcon = nativeImage.createFromPath(
+  path.resolve(__dirname, "../../public/tray.png")
+);
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow;
@@ -79,11 +82,7 @@ app.on("activate", () => {
 
 // create main BrowserWindow when electron is ready
 app.on("ready", () => {
-  const icon = nativeImage.createFromPath(
-    path.resolve(__dirname, "../../public/tray.png")
-  );
-
-  const tray = new Tray(icon);
+  const tray = new Tray(trayIcon);
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -104,7 +103,7 @@ app.on("ready", () => {
     },
   ]);
 
-  tray.setToolTip("This is my application.");
+  tray.setToolTip("Tesla Editor");
   tray.setContextMenu(contextMenu);
 
   mainWindow = createMainWindow();
@@ -113,6 +112,7 @@ app.on("will-quit", (event) => {
   if (
     dialog.showMessageBoxSync(mainWindow, {
       type: "question",
+      title: "Tesla Editor",
       message: "Are you sure you want to quit?",
       buttons: ["Yes", "No"],
     }) === 1
@@ -122,11 +122,6 @@ app.on("will-quit", (event) => {
   }
 });
 
-ipcMain.on("anything-asynchronous", (event, arg) => {
-  //execute tasks on behalf of renderer process
-  console.log(arg); // prints "ping"
-  event.reply("asynchronous-reply", new Date().toString());
-});
 function resolveHome(filepath) {
   if (filepath[0] === "~") {
     return path.join(process.env.HOME, filepath.slice(1));
@@ -167,7 +162,7 @@ menu.append(
     submenu: [
       {
         role: "new",
-        label: "new",
+        label: "New",
         accelerator: process.platform === "darwin" ? "Cmd+N" : "Ctrl+N",
         click: () => {
           if (!mainWindow) {
