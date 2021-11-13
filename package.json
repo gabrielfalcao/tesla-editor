@@ -55,9 +55,6 @@
     "whiteListedModules": [
       "monaco-editor"
     ],
-    "main": {
-      "webpackConfig": "webpack.main.config.js"
-    },
     "renderer": {
       "webpackConfig": "webpack.renderer.config.js"
     }
