@@ -13,7 +13,7 @@ const {
 
 import * as path from "path";
 import * as fs from "fs";
-import * as os from "os";
+
 import { format as formatUrl } from "url";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -79,6 +79,34 @@ app.on("activate", () => {
 
 // create main BrowserWindow when electron is ready
 app.on("ready", () => {
+  const icon = nativeImage.createFromPath(
+    path.resolve(__dirname, "../../public/tray.png")
+  );
+
+  const tray = new Tray(icon);
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Show Window",
+      type: "normal",
+      click() {
+        if (!mainWindow) {
+          mainWindow = createMainWindow();
+        }
+      },
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click() {
+        process.exit(0);
+      },
+    },
+  ]);
+
+  tray.setToolTip("This is my application.");
+  tray.setContextMenu(contextMenu);
+
   mainWindow = createMainWindow();
 });
 app.on("will-quit", (event) => {
@@ -93,33 +121,7 @@ app.on("will-quit", (event) => {
     mainWindow = createMainWindow();
   }
 });
-/* app.on("ready", () => {
- *   const icon = nativeImage.createFromPath(path.resolve(__dirname, "tray.png"));
- *
- *   tray = new Tray(icon);
- *
- *   const contextMenu = Menu.buildFromTemplate([
- *     {
- *       label: "Show Window",
- *       type: "normal",
- *       click(menuItem, browserWindow, event) {
- *         createMainWindow();
- *       }
- *     },
- *     {
- *       label: "Quit",
- *       type: "normal",
- *       click(menuItem, browserWindow, event) {
- *         process.exit(0);
- *       }
- *     }
- *   ]);
- *
- *   tray.setToolTip("This is my application.");
- *   tray.setContextMenu(contextMenu);
- *
- * });
- *  */
+
 ipcMain.on("anything-asynchronous", (event, arg) => {
   //execute tasks on behalf of renderer process
   console.log(arg); // prints "ping"
@@ -154,7 +156,7 @@ ipcMain.on("write-code", (event, { filename, content }) => {
   writeFile(filename, content);
 });
 
-ipcMain.on("quit", (event, filename) => {
+ipcMain.on("quit", () => {
   process.exit(0);
 });
 
@@ -190,7 +192,7 @@ menu.append(
             title: "Open a file",
             message: "binary files are not supported",
             defaultPath: path.resolve(__dirname, "../.."),
-            properties: ["openFile"],
+            properties: ["openFile", "showHiddenFiles"],
           });
           if (filename) {
             loadFileIntoRenderer(filename);

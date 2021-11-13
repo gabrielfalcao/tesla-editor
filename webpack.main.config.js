@@ -10,15 +10,15 @@ module.exports = {
         test: /\.jsx?/,
         exclude: /(node_modules)/,
         use: {
-          loader: "babel-loader"
-        }
-      }
-    ]
+          loader: "babel-loader",
+        },
+      },
+    ],
   },
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
-    modules: [srcPath, "node_modules"]
+    modules: [srcPath, "node_modules"],
   },
   devtool: "inline-source-map",
-  plugins: []
+  plugins: [],
 };

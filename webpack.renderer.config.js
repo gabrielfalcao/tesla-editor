@@ -8,11 +8,6 @@ const { dependencies } = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, "package.json"))
 );
 
-
-
-
-
-
 const srcPath = path.resolve(__dirname, "src");
 const PRODUCTION = process.env.NODE_ENV === "production";
 const monacoPath = path.resolve(__dirname, "node_modules/monaco-editor/min");
@@ -37,29 +32,29 @@ module.exports = {
         test: /\.jsx?/,
         exclude: /(node_modules)/,
         use: {
-          loader: "babel-loader"
-        }
+          loader: "babel-loader",
+        },
       },
       {
         test: /\.ttf$/,
         exclude: /(node_modules)/,
         include: monacoPath,
-        use: ["file-loader"]
+        use: ["file-loader"],
       },
       {
         test: /\.css$/,
         exclude: /(node_modules)/,
         include: monacoPath,
-        use: ["style-loader", "css-loader"]
-      }
-    ]
+        use: ["style-loader", "css-loader"],
+      },
+    ],
   },
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
     modules: [srcPath, "node_modules"],
     alias: {
       //"monaco-editor": monacoPath
-    }
+    },
   },
   devtool: "inline-source-map",
   plugins: [
@@ -76,6 +71,6 @@ module.exports = {
     /* new ProvidePlugin({
      *   monaco: monacoPath
      * }), */
-    new MonacoWebpackPlugin()
-  ]
+    new MonacoWebpackPlugin(),
+  ],
 };

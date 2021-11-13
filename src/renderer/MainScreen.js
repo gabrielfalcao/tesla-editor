@@ -1,7 +1,6 @@
-import * as path from "path";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ipcRenderer } from "electron";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+//import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import TopBar from "./TopBar";
 import Editor from "./Editor";
@@ -20,7 +19,7 @@ export default function MainScreen() {
   ipcRenderer.once("file-loaded", (_, arg) => {
     setCode(arg);
   });
-  ipcRenderer.once("file-written", (_, arg) => {
+  ipcRenderer.once("file-written", () => {
     setDirty(false);
   });
 

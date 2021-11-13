@@ -1,12 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import Button from "react-bootstrap/Button";
-import NavDropdown from "react-bootstrap/NavDropdown";
+import React from "react";
 import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { ipcRenderer } from "electron";
 
 const statusBarStyle = {
   height: "32px",

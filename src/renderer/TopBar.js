@@ -1,14 +1,9 @@
-import * as path from "path";
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 
-import Button from "react-bootstrap/Button";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { ipcRenderer } from "electron";
 import { FileCode } from "react-bootstrap-icons";
 

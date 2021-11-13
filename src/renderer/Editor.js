@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ipcRenderer } from "electron";
 import * as monaco from "monaco-editor";
 
@@ -29,10 +29,7 @@ export default function Editor({
   dirty,
   ...options
 } = defaultOptions) {
-  const element = useRef(null);
   const [editor, setEditor] = useState(null);
-  const [value, setValue] = useState(options.value);
-  const [filename, setFilename] = useState(options.filename);
 
   monaco.editor.defineTheme("myTheme", {
     base: "vs",
@@ -69,7 +66,7 @@ export default function Editor({
       );
 
       editor.setModel(model);
-      editor.getModel().onDidChangeContent((event) => {
+      editor.getModel().onDidChangeContent(() => {
         const newValue = editor.getModel().getValue();
         const hasChanged = newValue !== options.value;
         if (hasChanged) {
@@ -93,7 +90,7 @@ export default function Editor({
       window.addEventListener("resize", () => loadEditor(editor));
     }
   });
-  ipcRenderer.once("save-file", (event, arg) => {
+  ipcRenderer.once("save-file", () => {
     if (editor && dirty) {
       const model = editor.getModel();
       const code = {
