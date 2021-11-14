@@ -1,94 +1,92 @@
-import React, { useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
+import React, { useLayoutEffect } from "react";
 import * as monaco from "monaco-editor";
+import { useEditor } from "@app/renderer/EditorProvider";
 
 const editorStyle = {
   minWidth: "100%",
   height: "100%",
   position: "relative",
-  marginTop: "64px",
+  marginTop: "64px"
 };
 const containerStyle = {
   minWidth: "100%",
   height: "100%",
-  position: "absolute",
+  position: "absolute"
 };
 export const defaultOptions = {
   theme: "vs-dark",
   height: "100%",
   fontSize: "18px",
   scrollBeyondLastLine: false,
-  width: "100%",
-  value: undefined,
-  setDirty: () => {},
-  dirty: undefined,
+  width: "100%"
 };
 
-export default function Editor({
-  setLanguage,
-  language,
-  setDirty,
-  dirty,
-  ...options
-} = defaultOptions) {
-  const [editor, setEditor] = useState(null);
+export function loadCodeIntoEditor(instance, code) {
+  instance.getModel().dispose();
+  const model = monaco.editor.createModel(
+    code.content,
+    code.content, // detect language when `undefined`
+    monaco.Uri.file(code.filename) // uri
+  );
+  instance.setModel(model);
+  return model;
+}
+export default function Editor(options = defaultOptions) {
+  const {
+    code,
+    dirty,
+    language,
+    instance,
+    setDirty,
+    setInstance,
+    setLanguage
+  } = useEditor();
 
-  const loadEditor = (current) => {
+  const loadEditor = current => {
     const container = document.getElementById("monaco-parent");
     container.innerHTML = "";
-    const editor =
+    const monacoInstance =
       current ||
       monaco.editor.create(container, {
         ...defaultOptions,
         ...options,
-        language,
-        value: undefined,
+        language: undefined,
+        value: code.content
       });
 
-    if (options.value) {
-      editor.getModel().dispose();
-      const model = monaco.editor.createModel(
-        options.value,
-        language, // language
-        monaco.Uri.file(options.filename) // uri
-      );
+    if (code.content && code.filename) {
+      const model = loadCodeIntoEditor(monacoInstance, code);
       const detectedLanguage = model.getLanguageId();
-      editor.setModel(model);
       model.onDidChangeContent(() => {
         const newValue = model.getValue();
         const hasChanged = newValue !== options.value;
         if (hasChanged) {
           if (!dirty) {
             setDirty(true);
-            editor.focus();
+            monacoInstance.focus();
           }
         }
       });
-      setEditor(editor);
-      if (detectedLanguage) {
+      setInstance(monacoInstance);
+      console.warn({ detectedLanguage });
+      if (detectedLanguage !== language) {
         setLanguage(detectedLanguage);
       }
     }
   };
-  useEffect(() => {
-    if (!editor) {
+  useLayoutEffect(() => {
+    if (!instance) {
       loadEditor();
     } else {
-      if (!editor.getModel().uri.path.match(options.filename)) {
-        loadEditor(editor);
+      if (!instance.getModel().uri.path.match(options.filename)) {
+        loadEditor(instance);
       }
-      window.addEventListener("resize", () => loadEditor(editor));
-    }
-  });
-  ipcRenderer.once("save-file", () => {
-    if (editor && dirty) {
-      const model = editor.getModel();
-      const code = {
-        filename: model.uri.path,
-        content: model.getValue(),
-      };
-      console.log("requesting to write file", code);
-      ipcRenderer.send("write-code", code);
+      // auto resize editor
+      window.addEventListener(
+        "resize",
+        // see: https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.IEditor.html#layout
+        () => instance.layout()
+      );
     }
   });
 

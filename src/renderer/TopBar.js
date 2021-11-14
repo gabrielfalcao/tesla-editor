@@ -6,8 +6,9 @@ import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
 import { ipcRenderer } from "electron";
 //import { FileCode } from "react-bootstrap-icons";
-import appIcon from "app.png";
-import { basicLanguages, knownFiles } from "./constants";
+import appIcon from "@app.png";
+import { useEditor } from "@app/renderer/EditorProvider";
+import { basicLanguages, knownFiles } from "@app/renderer/constants";
 
 //green: "#d5ce6d"
 const dropdownStyle = {
@@ -17,10 +18,12 @@ const dropdownStyle = {
   color: "white",
   position: "absolute",
   right: "0",
-  margin: "0.5rem 2rem 0 0",
+  margin: "0.5rem 2rem 0 0"
 };
 
-export default function TopBar({ filename, language, setLanguage, dirty }) {
+export default function TopBar() {
+  const { dirty, code, setLanguage, language } = useEditor();
+  const { filename } = code;
   return (
     <Navbar bg="dark" variant="dark" expand="sm" fixed="top">
       <Container fluid>
@@ -33,7 +36,7 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
                 </>
               }
             >
-              {knownFiles.map((filename) => (
+              {knownFiles.map(filename => (
                 <NavDropdown.Item
                   key={filename}
                   onClick={() => {
@@ -58,12 +61,12 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
               <select
                 style={dropdownStyle}
                 value={language}
-                onChange={(event) => {
+                onChange={event => {
                   const lang = event.target.value;
                   setLanguage(lang);
                 }}
               >
-                {basicLanguages.map((value) => (
+                {basicLanguages.map(value => (
                   <option key={value} value={value}>
                     {value}
                   </option>
@@ -77,7 +80,7 @@ export default function TopBar({ filename, language, setLanguage, dirty }) {
                 fontSize: "1rem",
                 fontWeight: "normal",
                 fontStyle: dirty ? "italic" : "normal",
-                color: dirty ? "tan" : "#fff",
+                color: dirty ? "tan" : "#fff"
               }}
             >
               {dirty ? "*" : null}
