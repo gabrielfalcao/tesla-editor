@@ -4,7 +4,7 @@ import { styled, keyframes } from "pretty-lights";
 import appIcon from "@app.png";
 import TopBar from "@app/renderer/TopBar";
 import Editor from "@app/renderer/Editor";
-import { useEditor } from "@app/renderer/EditorProvider";
+import { useEditor } from "@app/renderer/Editor/Provider";
 
 const shakeSteps = [
   { translation: [1, 1], rotation: 0 },

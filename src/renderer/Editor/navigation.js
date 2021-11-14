@@ -1,16 +1,6 @@
-import React, { useEffect } from "react";
-import { styled } from "pretty-lights";
 import * as monaco from "monaco-editor";
-
-import { useEditor } from "@app/renderer/EditorProvider";
 const { KeyMod, KeyCode } = monaco;
-export const defaultOptions = {
-  theme: "vs-dark",
-  height: "100%",
-  fontSize: "18px",
-  scrollBeyondLastLine: false,
-  width: "100%",
-};
+
 export function getPreviousWordPosition(editor) {
   const model = editor.getModel();
   const position = editor.getPosition();
@@ -19,7 +9,7 @@ export function getPreviousWordPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column - 1,
-    endColumn: column,
+    endColumn: column
   };
   if (range.startColumn <= 0) {
     if (lineNumber > 0) {
@@ -42,7 +32,7 @@ export function getNextWordPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column,
-    endColumn: column + 1,
+    endColumn: column + 1
   };
   const lineLength = model.getLineLength(lineNumber);
   if (column - 1 === lineLength) {
@@ -67,7 +57,7 @@ export function getPreviousCharacterPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column - 1,
-    endColumn: column,
+    endColumn: column
   };
   if (range.startColumn < 0) {
     if (lineNumber > 1) {
@@ -84,7 +74,7 @@ export function getNextCharacterPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column,
-    endColumn: column + 1,
+    endColumn: column + 1
   };
   while (/^\w+$/.test(model.getValueInRange(range))) {
     range.endColumn += 1;
@@ -95,26 +85,7 @@ export function getNextCharacterPosition(editor) {
   return { lineNumber: range.endLineNumber, column: range.endColumn + 1 };
 }
 
-export function createEditor(parentElement, options) {
-  const editor = monaco.editor.create(parentElement, {
-    ...defaultOptions,
-    ...options,
-    language: undefined,
-    value: "",
-  });
-  console.log({
-    "KeyCode-Alt": KeyCode.Alt,
-    "KeyMod-Alt": KeyMod.Alt,
-  });
-
-  window.addEventListener(
-    "resize",
-    // see: https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.IEditor.html#layout
-    () => {
-      parentElement.style.height = `${window.innerHeight - 48}px`;
-      editor.layout();
-    }
-  );
+export function setupEmacsNavigation(editor) {
   // Emacs Navigation Keybindings
   editor.addCommand(KeyMod.Alt | KeyCode.KeyB, () => {
     editor.setPosition(getPreviousWordPosition(editor));
@@ -138,27 +109,4 @@ export function createEditor(parentElement, options) {
     editor.setPosition({ lineNumber, column: column + 1 });
   });
   return editor;
-}
-
-const MonacoContainer = styled.div`
-  position: relative;
-`;
-
-export default function Editor(options = defaultOptions) {
-  const { setInstance, instance } = useEditor();
-
-  useEffect(() => {
-    if (!instance) {
-      setInstance(
-        createEditor(document.getElementById("monaco-parent"), options)
-      );
-    }
-  });
-
-  return (
-    <MonacoContainer
-      style={{ height: `${window.innerHeight - 48}px` }}
-      id="monaco-parent"
-    />
-  );
 }

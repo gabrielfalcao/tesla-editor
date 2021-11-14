@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import MainScreen from "./MainScreen";
-import { EditorProvider } from "./EditorProvider";
-import { showError } from "./util";
+import MainScreen from "@app/renderer/MainScreen";
+import { EditorProvider } from "@app/renderer/Editor/Provider";
+import { showError } from "@app/renderer/util";
 
 function render() {
   const root = document.getElementById("app");

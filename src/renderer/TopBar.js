@@ -8,7 +8,7 @@ import Container from "react-bootstrap/Container";
 import { ipcRenderer } from "electron";
 //import { FileCode } from "react-bootstrap-icons";
 import appIcon from "@app.png";
-import { useEditor } from "@app/renderer/EditorProvider";
+import { useEditor } from "@app/renderer/Editor/Provider";
 import { basicLanguages, knownFiles } from "@app/renderer/constants";
 
 //green: "#d5ce6d"
