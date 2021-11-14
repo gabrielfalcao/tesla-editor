@@ -1,5 +1,5 @@
 import React from "react";
-import { css } from "@emotion/react";
+import { css } from "pretty-lights";
 
 const baseStyles = css`
   margin: 0;

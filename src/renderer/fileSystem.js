@@ -5,7 +5,7 @@ import * as monaco from "monaco-editor";
 
 export function resolveHome(filepath) {
   if (filepath[0] === "~") {
-    return path.join(process.env.HOME, filepath.slice(1));
+    return path.join(os.homedir(), filepath.slice(1));
   }
   return path.resolve(filepath);
 }
@@ -24,11 +24,11 @@ export function readFile(filename) {
 
 // @param {string} filename
 // @return {monaco.Model}
-function loadCodeForMonaco(filename) {
+export function loadCodeForMonaco(filename, language) {
   const content = readFile(filename);
   const model = monaco.editor.createModel(
     content,
-    undefined, // detect language when `undefined`
+    language, // detect language when `undefined`
     monaco.Uri.file(filename) // uri
   );
   return model;

@@ -12,7 +12,6 @@ const {
 } = require("electron");
 
 import * as path from "path";
-import * as fs from "fs";
 
 import { format as formatUrl } from "url";
 
@@ -122,34 +121,9 @@ app.on("will-quit", (event) => {
   }
 });
 
-function resolveHome(filepath) {
-  if (filepath[0] === "~") {
-    return path.join(process.env.HOME, filepath.slice(1));
-  }
-  return path.resolve(filepath);
-}
-
-function writeFile(filename, content) {
-  const bytes = fs.writeFileSync(resolveHome(filename), content, {
-    encoding: "utf-8",
-  });
-  console.log(`wrote ${filename}: ${bytes}`);
-  mainWindow.webContents.send("file-written", { content, filename, bytes });
-}
-
 function loadFileIntoRenderer(filename) {
-  const content = fs.readFileSync(resolveHome(filename), "utf-8");
-  mainWindow.webContents.send("file-loaded", {
-    content,
-    filename,
-  });
+  mainWindow.webContents.send("open-file", filename);
 }
-ipcMain.on("read-file", (event, filename) => {
-  loadFileIntoRenderer(filename);
-});
-ipcMain.on("write-code", (event, { filename, content }) => {
-  writeFile(filename, content);
-});
 
 ipcMain.on("quit", () => {
   process.exit(0);

@@ -50,6 +50,7 @@ export const basicLanguages = [
   "pgsql",
   "php",
   "pla",
+  "plaintext",
   "postiats",
   "powerquery",
   "powershell",
