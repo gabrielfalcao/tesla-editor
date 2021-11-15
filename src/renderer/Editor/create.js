@@ -7,7 +7,7 @@ export const defaultOptions = {
   height: "100%",
   fontSize: "18px",
   scrollBeyondLastLine: false,
-  width: "100%",
+  width: "100%"
 };
 
 export function createEditor(parentElement, options, context) {
@@ -15,9 +15,9 @@ export function createEditor(parentElement, options, context) {
     ...defaultOptions,
     ...options,
     language: undefined,
-    value: "",
+    value: ""
   });
-  const widget = createOverlayWidget(context);
+  const widget = createOverlayWidget({ ...context, instance: editor });
   setupEmacsNavigation(editor);
   editor.addOverlayWidget(widget);
   window.addEventListener(

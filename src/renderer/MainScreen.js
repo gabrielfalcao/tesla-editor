@@ -18,7 +18,7 @@ const shakeSteps = [
   { translation: [3, 1], rotation: -1 },
   { translation: [-1, -1], rotation: 1 },
   { translation: [1, 2], rotation: 0 },
-  { translation: [1, -2], rotation: -1 },
+  { translation: [1, -2], rotation: -1 }
 ];
 
 const shake = (x = 0, y = 0, coefficient = 5) => {
@@ -27,11 +27,9 @@ const shake = (x = 0, y = 0, coefficient = 5) => {
     const cursor = index + 1;
     const percentage = cursor * 10;
     parts.push(
-      `${percentage}% { transform: translate(${
-        x * coefficient + delta.translation[0]
-      }px, ${y * coefficient + delta.translation[0]}px) rotate(${
-        delta.rotation
-      }deg); }`
+      `${percentage}% { transform: translate(${x * coefficient +
+        delta.translation[0]}px, ${y * coefficient +
+        delta.translation[0]}px) rotate(${delta.rotation}deg); }`
     );
   });
   return parts.join("\n");
@@ -56,25 +54,24 @@ const funky = (x, y) => keyframes`
 `;
 
 const Image = styled.img`
-  position: fixed;
-  top: 25%;
-  left: 25%;
+  position: relative;
+  top: 50%;
+  left: 50%;
 
-  animation: breathing 5s ease-out infinite normal;
+  animation: breathing 0.314s ease-out infinite normal;
 `;
 const Overlay = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
   background: #333;
-  z-index: 1000;
+  z-index: 10000;
   text-align: center;
 `;
 
 function Splash() {
   return (
-    <Overlay>
+    <Overlay className="h-100 w-100">
       <Image src={appIcon} width="256" height="256" />
+      <br />
+      <h1 style={{ color: "#fff" }}>loading...</h1>
     </Overlay>
   );
 }

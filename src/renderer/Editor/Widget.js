@@ -10,7 +10,7 @@ import {
   hideCommandLine,
   showCommandLine,
   hideCompletion,
-  showCompletion,
+  showCompletion
 } from "@app/renderer/Editor/commands";
 
 function getParentHeight() {
@@ -70,7 +70,7 @@ export function loadPathFromCommandLine() {
   const text = inputElement.value;
   const target = resolveHome(text);
   let directory = path.dirname(target);
-  const filename = path.basename(text);
+  let filename = path.basename(target);
   let stat = null;
   let exists = false;
   if (!fs.existsSync(target)) {
@@ -82,6 +82,7 @@ export function loadPathFromCommandLine() {
       directory = path.dirname(target);
     } else if (stat.isDirectory()) {
       directory = target;
+      filename = "";
     }
   }
   return { text, target, exists, directory, filename, stat, inputElement };
@@ -95,16 +96,24 @@ export function doOpenFile({ openFile }) {
 export function autoComplete() {
   const completionElement = document.getElementById("command-line-completion");
 
-  const { stat, target, directory, filename, inputElement } =
-    loadPathFromCommandLine();
+  const {
+    stat,
+    target,
+    directory,
+    filename,
+    inputElement
+  } = loadPathFromCommandLine();
   let choices = [];
   if (fs.existsSync(directory)) {
     choices = fs
       .readdirSync(directory)
-      .filter((f) => f.startsWith(filename) && f !== filename);
+      .filter(f => f.startsWith(filename) && f !== filename);
   } else if (stat.isDirectory()) {
     choices = fs.readdirSync(target);
+  } else if (filename.length === 0) {
+    choices = fs.readdirSync(directory);
   }
+  console.log({ choices, filename, target, directory });
   if (choices.length === 1) {
     hideCompletion();
     showCommandLine(collapseHome(path.join(directory, choices[0])));
@@ -114,8 +123,7 @@ export function autoComplete() {
     hideCompletion();
   }
 }
-export function Widget({ editor }) {
-  const { instance } = editor;
+export function Widget(context, editor) {
   function onKeyDown(e) {
     switch (e.keyCode) {
       case 8: // Backspace
@@ -132,7 +140,7 @@ export function Widget({ editor }) {
         e.preventDefault();
         return false;
       case 13: // Enter
-        doOpenFile(editor);
+        doOpenFile(context);
         e.preventDefault();
         return false;
       default:
@@ -147,22 +155,22 @@ export function Widget({ editor }) {
   );
 }
 
-export function createWidget(context) {
+export function createWidget(context, editor) {
   const element = document.createElement("div");
-  ReactDOM.render(<Widget editor={context} />, element);
+  ReactDOM.render(<Widget context={context} editor={editor} />, element);
   window.addEventListener(
     "resize",
     // see: https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.IEditor.html#layout
     () => {
-      ReactDOM.render(<Widget editor={context} />, element);
+      ReactDOM.render(<Widget context={context} editor={editor} />, element);
     }
   );
 
   return element;
 }
 
-export function createOverlayWidget(context) {
-  const element = createWidget(context);
+export function createOverlayWidget(context, editor) {
+  const element = createWidget(context, editor);
 
   return {
     getDomNode() {
@@ -173,6 +181,6 @@ export function createOverlayWidget(context) {
     },
     getPosition() {
       return null;
-    },
+    }
   };
 }
