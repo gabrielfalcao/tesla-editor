@@ -6,23 +6,20 @@ import { createEditor } from "./create";
 
 const MonacoContainer = styled.div`
   position: relative;
+  height: ${() => window.innerHeight - 48}px;
 `;
 
-export default function Editor(options = defaultOptions) {
-  const { setInstance, instance } = useEditor();
+export default function Editor({ ...options }) {
+  const context = useEditor();
+  const { setInstance, instance } = context;
 
   useEffect(() => {
     if (!instance) {
       setInstance(
-        createEditor(document.getElementById("monaco-parent"), options)
+        createEditor(document.getElementById("monaco-parent"), options, context)
       );
     }
   });
 
-  return (
-    <MonacoContainer
-      style={{ height: `${window.innerHeight - 48}px` }}
-      id="monaco-parent"
-    />
-  );
+  return <MonacoContainer id="monaco-parent" />;
 }

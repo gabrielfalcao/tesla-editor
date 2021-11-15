@@ -4,6 +4,7 @@ import { styled, keyframes } from "pretty-lights";
 import appIcon from "@app.png";
 import TopBar from "@app/renderer/TopBar";
 import Editor from "@app/renderer/Editor";
+import { Widget } from "@app/renderer/Editor/Widget";
 import { useEditor } from "@app/renderer/Editor/Provider";
 
 const shakeSteps = [
@@ -37,25 +38,35 @@ const shake = (x = 0, y = 0, coefficient = 5) => {
 };
 
 const funky = (x, y) => keyframes`
-  ${shake(x, y)}
+  0% {
+    transform: scale(0.9);
+  }
+
+  25% {
+    transform: scale(1);
+  }
+
+  60% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(0.9);
+  }
 `;
 
 const Image = styled.img`
   position: fixed;
   top: 25%;
-  left: 50%;
+  left: 25%;
 
-  animation: ${funky(0, 28)} 0.314s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-timing-function: ease-in-out;
-  transform: translateY(28px);
+  animation: breathing 5s ease-out infinite normal;
 `;
 const Overlay = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  background: #666;
+  background: #333;
   z-index: 1000;
   text-align: center;
 `;
@@ -63,7 +74,7 @@ const Overlay = styled.div`
 function Splash() {
   return (
     <Overlay>
-      <Image src={appIcon} width="512" height="512" />
+      <Image src={appIcon} width="256" height="256" />
     </Overlay>
   );
 }

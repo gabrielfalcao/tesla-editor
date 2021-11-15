@@ -34,7 +34,11 @@ export function useEditorProvider() {
     const detectedLanguage = model.getLanguageId();
 
     instance.setModel(model);
-    setCode(model.getValue());
+    setCode({
+      filename: filename,
+      content: model.getValue(),
+      language: detectedLanguage,
+    });
     setDirty(false);
     setLanguage(detectedLanguage);
 
@@ -49,7 +53,7 @@ export function useEditorProvider() {
       }
     });
     console.log("openFile", { filename, detectedLanguage });
-
+    instance.focus();
     return model;
   }
   if (instance) {
@@ -71,6 +75,12 @@ export function useEditorProvider() {
     // TODO: do I need to redraw the editor in case font size changes?
     instance.layout();
   }
+
+  if (code && code.filename) {
+    const filename = document.getElementById("filename");
+    filename.innerText = code.filename;
+  }
+
   return {
     code,
     setCode,

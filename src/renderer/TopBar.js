@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Navbar from "react-bootstrap/Navbar";
@@ -85,20 +85,17 @@ export default function TopBar() {
               </Nav.Item>
             </Nav>
           )}
-
-          {code.filename ? (
-            <Navbar.Brand
-              style={{
-                fontSize: "1rem",
-                fontWeight: "normal",
-                fontStyle: dirty ? "italic" : "normal",
-                color: dirty ? "tan" : "#fff",
-              }}
-            >
-              {dirty ? "*" : null}
-              {code.filename}
-            </Navbar.Brand>
-          ) : null}
+          <Navbar.Brand
+            style={{
+              fontSize: "1rem",
+              fontWeight: "normal",
+              fontStyle: dirty ? "italic" : "normal",
+              color: dirty ? "tan" : "#fff",
+            }}
+          >
+            {dirty ? "*" : null}
+            <span id="filename">{code?.filename}</span>
+          </Navbar.Brand>
         </Navbar.Collapse>
       </Container>
     </Navbar>

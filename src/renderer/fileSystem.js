@@ -33,3 +33,5 @@ export function loadCodeForMonaco(filename, language) {
   );
   return model;
 }
+
+export const collapseHome = (t) => t.replace(os.homedir(), "~");

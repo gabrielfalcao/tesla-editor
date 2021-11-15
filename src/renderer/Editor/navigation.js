@@ -1,5 +1,10 @@
 import * as monaco from "monaco-editor";
+import * as os from "os";
 const { KeyMod, KeyCode } = monaco;
+import {
+  openEmacsCommand,
+  openFileCommand,
+} from "@app/renderer/Editor/commands";
 
 export function getPreviousWordPosition(editor) {
   const model = editor.getModel();
@@ -9,7 +14,7 @@ export function getPreviousWordPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column - 1,
-    endColumn: column
+    endColumn: column,
   };
   if (range.startColumn <= 0) {
     if (lineNumber > 0) {
@@ -32,7 +37,7 @@ export function getNextWordPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column,
-    endColumn: column + 1
+    endColumn: column + 1,
   };
   const lineLength = model.getLineLength(lineNumber);
   if (column - 1 === lineLength) {
@@ -57,7 +62,7 @@ export function getPreviousCharacterPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column - 1,
-    endColumn: column
+    endColumn: column,
   };
   if (range.startColumn < 0) {
     if (lineNumber > 1) {
@@ -74,7 +79,7 @@ export function getNextCharacterPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column,
-    endColumn: column + 1
+    endColumn: column + 1,
   };
   while (/^\w+$/.test(model.getValueInRange(range))) {
     range.endColumn += 1;
@@ -108,5 +113,18 @@ export function setupEmacsNavigation(editor) {
     const column = model.getLineLength(lineNumber);
     editor.setPosition({ lineNumber, column: column + 1 });
   });
+  editor.addCommand(
+    monaco.KeyMod.chord(
+      monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyX,
+      monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyF
+    ),
+    () => openFileCommand(editor)
+  );
+  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () =>
+    openEmacsCommand(editor)
+  );
+  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyX, () =>
+    openEmacsCommand(editor)
+  );
   return editor;
 }
