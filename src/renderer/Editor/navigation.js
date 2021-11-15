@@ -100,7 +100,8 @@ const selection = {
     endColumn: 0,
   },
 };
-export function setupEmacsNavigation(editor) {
+export function setupEmacsNavigation(context, editor) {
+  const { saveFile } = context;
   // Emacs Navigation Keybindings
   editor.addCommand(KeyMod.Alt | KeyCode.KeyB, () => {
     editor.setPosition(getPreviousWordPosition(editor));
@@ -126,21 +127,29 @@ export function setupEmacsNavigation(editor) {
   editor.addCommand(KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Period, () => {
     goToBufferEnd(editor);
   });
-  editor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.Space, () =>
-    alert("Gotcha")
-  );
+  editor.addCommand(KeyMod.CtrlCmd | KeyCode.Space, () => {
+    console.log("set selection");
+    const position = editor.getPosition();
+    selection.active = true;
+    selection.range.startLineNumber = position.lineNumber;
+    selection.range.endLineNumber = position.lineNumber;
+    selection.range.startColumn = position.column;
+    selection.range.endColumn = position.column;
+    console.log(selection.range);
+    editor.selection(selection.range);
+  });
 
-  /* editor.addCommand(KeyMod.WinCtrl | KeyCode.Space, () => {
-     * console.log("set selection");
-     * const position = editor.getPosition();
-     * selection.active = true;
-     * selection.range.startLineNumber = position.lineNumber;
-     * selection.range.endLineNumber = position.lineNumber;
-     * selection.range.startColumn = position.column;
-     * selection.range.endColumn = position.column;
-     * console.log(selection.range);
-     * editor.selection(selection.range);
-       }); */
+  editor.addCommand(KeyMod.WinCtrl | KeyCode.Space, () => {
+    console.log("set selection");
+    const position = editor.getPosition();
+    selection.active = true;
+    selection.range.startLineNumber = position.lineNumber;
+    selection.range.endLineNumber = position.lineNumber;
+    selection.range.startColumn = position.column;
+    selection.range.endColumn = position.column;
+    console.log(selection.range);
+    editor.selection(selection.range);
+  });
   editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyG, () => {
     console.log("interrupt");
   });
@@ -178,6 +187,13 @@ export function setupEmacsNavigation(editor) {
     console.log("run command");
     editor.getAction("editor.action.quickCommand").run("");
   });
+  editor.addCommand(
+    KeyMod.chord(KeyMod.WinCtrl | KeyMod.KeyX, KeyMod.WinCtrl | KeyCode.KeyS),
+    () => {
+      console.log("save file");
+      saveFile();
+    }
+  );
 
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () =>
     openEmacsCommand(editor)

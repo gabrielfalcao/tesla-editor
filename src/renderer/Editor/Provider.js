@@ -62,9 +62,12 @@ export function useEditorProvider() {
       openFile(filename);
     });
     ipcRenderer.on("save-file", () => {
-      writeFile(code.filename, instance.getModel().getValue());
-      setDirty(false);
+      saveFile();
     });
+  }
+  function saveFile() {
+    writeFile(code.filename, instance.getModel().getValue());
+    setDirty(false);
   }
   function updateOptions(opts) {
     const options = opts || {};
@@ -97,6 +100,7 @@ export function useEditorProvider() {
     setInstance,
 
     openFile,
+    saveFile,
     updateOptions,
   };
 }

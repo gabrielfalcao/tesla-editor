@@ -20,7 +20,7 @@ export function createEditor(parentElement, options, context) {
     value: "",
   });
   const widget = createOverlayWidget(context, editor);
-  setupEmacsNavigation(editor);
+  setupEmacsNavigation(context, editor);
   editor.addOverlayWidget(widget);
   window.addEventListener(
     "resize",
