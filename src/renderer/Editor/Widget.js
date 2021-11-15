@@ -10,7 +10,7 @@ import {
   hideCommandLine,
   showCommandLine,
   hideCompletion,
-  showCompletion
+  showCompletion,
 } from "@app/renderer/Editor/commands";
 
 function getParentHeight() {
@@ -21,7 +21,7 @@ function getParentWidth() {
 }
 const containerStyle = css`
   height: 28px;
-  overflow: visible;
+  overflow: hidden;
   position: absolute;
   top: ${() => getParentHeight() - 86}px;
   width: ${() => getParentWidth()}px;
@@ -96,18 +96,13 @@ export function doOpenFile({ openFile }) {
 export function autoComplete() {
   const completionElement = document.getElementById("command-line-completion");
 
-  const {
-    stat,
-    target,
-    directory,
-    filename,
-    inputElement
-  } = loadPathFromCommandLine();
+  const { stat, target, directory, filename, inputElement } =
+    loadPathFromCommandLine();
   let choices = [];
   if (fs.existsSync(directory)) {
     choices = fs
       .readdirSync(directory)
-      .filter(f => f.startsWith(filename) && f !== filename);
+      .filter((f) => f.startsWith(filename) && f !== filename);
   } else if (stat.isDirectory()) {
     choices = fs.readdirSync(target);
   } else if (filename.length === 0) {
@@ -149,7 +144,7 @@ export function Widget(context, editor) {
   }
   return (
     <div css={containerStyle}>
-      <Completion id="command-line-completion">completion</Completion>
+      <Completion id="command-line-completion"></Completion>
       <CommandLine id="command-line" type="text" onKeyDown={onKeyDown} />
     </div>
   );
@@ -181,6 +176,6 @@ export function createOverlayWidget(context, editor) {
     },
     getPosition() {
       return null;
-    }
+    },
   };
 }

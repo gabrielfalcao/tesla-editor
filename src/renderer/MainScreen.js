@@ -18,7 +18,7 @@ const shakeSteps = [
   { translation: [3, 1], rotation: -1 },
   { translation: [-1, -1], rotation: 1 },
   { translation: [1, 2], rotation: 0 },
-  { translation: [1, -2], rotation: -1 }
+  { translation: [1, -2], rotation: -1 },
 ];
 
 const shake = (x = 0, y = 0, coefficient = 5) => {
@@ -27,9 +27,11 @@ const shake = (x = 0, y = 0, coefficient = 5) => {
     const cursor = index + 1;
     const percentage = cursor * 10;
     parts.push(
-      `${percentage}% { transform: translate(${x * coefficient +
-        delta.translation[0]}px, ${y * coefficient +
-        delta.translation[0]}px) rotate(${delta.rotation}deg); }`
+      `${percentage}% { transform: translate(${
+        x * coefficient + delta.translation[0]
+      }px, ${y * coefficient + delta.translation[0]}px) rotate(${
+        delta.rotation
+      }deg); }`
     );
   });
   return parts.join("\n");

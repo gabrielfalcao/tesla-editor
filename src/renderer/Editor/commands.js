@@ -34,8 +34,13 @@ export function hideCompletion() {
 }
 export function showCompletion(choices) {
   const completionElement = document.getElementById("command-line-completion");
+  const maxLength = Number.parseInt(completionElement.style.width || 80);
+  console.log({ maxLength });
   completionElement.style.visibility = "visible";
-  completionElement.innerHTML = choices.join(", ");
+  completionElement.innerHTML = choices
+    .join(", ")
+    .substring(0, maxLength * 1.8);
+
   return completionElement;
 }
 export function hideCommandLine() {
