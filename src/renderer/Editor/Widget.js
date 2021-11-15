@@ -19,6 +19,7 @@ function getParentHeight() {
 function getParentWidth() {
   return Number.parseInt(window.innerWidth);
 }
+const INTERNAL_COMMANDS = ["find-file", "save-buffer", "revert-buffer"];
 const containerStyle = css`
   height: 28px;
   overflow: hidden;
@@ -67,6 +68,8 @@ const CommandLine = styled.input`
 
 export function loadPathFromCommandLine() {
   const inputElement = document.getElementById("command-line");
+  const commandType = inputElement.getAttribute("data-type");
+
   const text = inputElement.value;
   const target = resolveHome(text);
   let directory = path.dirname(target);
@@ -85,41 +88,76 @@ export function loadPathFromCommandLine() {
       filename = "";
     }
   }
-  return { text, target, exists, directory, filename, stat, inputElement };
+
+  return {
+    text,
+    target,
+    exists,
+    directory,
+    filename,
+    stat,
+    inputElement,
+    commandType,
+  };
 }
-export function doOpenFile({ openFile }) {
+export function executeInternalCommand(context, editor) {
+  const inputElement = document.getElementById("command-line");
+  const command = `${inputElement.value}`;
+  if (command.length > 0) {
+    showCompletion([`The command "${command}" is not implemented yet`], true);
+  } else {
+    showCompletion([`empty command`], true);
+  }
+  setTimeout(() => hideCompletion(), Math.PI * 1000);
+}
+export function doOpenFile({ openFile }, editor) {
   const loaded = loadPathFromCommandLine();
   const { target } = loaded;
-  console.log(loaded);
-  openFile(target);
+  if (fs.existsSync(target)) {
+    hideCompletion();
+    hideCommandLine();
+    openFile(target, editor);
+  } else {
+    showCompletion([`path does not exist: ${collapseHome(target)}`], true);
+  }
 }
-export function autoComplete() {
+export function autoComplete(e) {
   const completionElement = document.getElementById("command-line-completion");
 
-  const { stat, target, directory, filename, inputElement } =
+  const { stat, target, directory, filename, inputElement, commandType } =
     loadPathFromCommandLine();
   let choices = [];
-  if (fs.existsSync(directory)) {
-    choices = fs
-      .readdirSync(directory)
-      .filter((f) => f.startsWith(filename) && f !== filename);
-  } else if (stat.isDirectory()) {
-    choices = fs.readdirSync(target);
-  } else if (filename.length === 0) {
-    choices = fs.readdirSync(directory);
-  }
-  console.log({ choices, filename, target, directory });
-  if (choices.length === 1) {
-    hideCompletion();
-    showCommandLine(collapseHome(path.join(directory, choices[0])));
-  } else if (choices.length > 1) {
-    showCompletion(choices);
+  if (commandType === "path") {
+    if (fs.existsSync(directory)) {
+      choices = fs
+        .readdirSync(directory)
+        .filter((f) => f.startsWith(filename) && f !== filename);
+    } else if (stat.isDirectory()) {
+      choices = fs.readdirSync(target);
+    } else if (filename.length === 0) {
+      choices = fs.readdirSync(directory);
+    }
+    console.log({ choices, filename, target, directory });
+
+    if (choices.length === 1) {
+      hideCompletion();
+      showCommandLine(collapseHome(path.join(directory, choices[0])), "path");
+    } else if (choices.length > 1) {
+      showCompletion(choices);
+    } else {
+      hideCompletion();
+    }
   } else {
-    hideCompletion();
+    choices = INTERNAL_COMMANDS.filter(
+      (cmd) => cmd.indexOf(inputElement.value) !== -1
+    );
+    showCompletion(choices);
   }
 }
-export function Widget(context, editor) {
+export function Widget({ context, editor }) {
   function onKeyDown(e) {
+    const inputElement = document.getElementById("command-line");
+    const commandType = inputElement.getAttribute("data-type");
     switch (e.keyCode) {
       case 8: // Backspace
         hideCompletion();
@@ -135,7 +173,11 @@ export function Widget(context, editor) {
         e.preventDefault();
         return false;
       case 13: // Enter
-        doOpenFile(context);
+        if (commandType === "path") {
+          doOpenFile(context, editor);
+        } else {
+          executeInternalCommand(context, editor);
+        }
         e.preventDefault();
         return false;
       default:
@@ -143,7 +185,7 @@ export function Widget(context, editor) {
     }
   }
   return (
-    <div css={containerStyle}>
+    <div id="command-line-widget" css={containerStyle}>
       <Completion id="command-line-completion"></Completion>
       <CommandLine id="command-line" type="text" onKeyDown={onKeyDown} />
     </div>
@@ -166,9 +208,9 @@ export function createWidget(context, editor) {
 
 export function createOverlayWidget(context, editor) {
   const element = createWidget(context, editor);
-
   return {
     getDomNode() {
+      //const element = document.getElementById("command-line-widget");
       return element;
     },
     getId() {

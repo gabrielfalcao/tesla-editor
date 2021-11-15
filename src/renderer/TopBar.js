@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-
+import { css, styled } from "pretty-lights";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Navbar from "react-bootstrap/Navbar";
 import Spinner from "react-bootstrap/Spinner";
@@ -22,12 +22,21 @@ const dropdownStyle = {
   margin: "0.5rem 2rem 0 0",
 };
 
+const Select = styled.select`
+  background-color: #272822;
+`;
 export default function TopBar() {
   const { dirty, code, updateOptions, language, openFile, instance } =
     useEditor();
 
   return (
-    <Navbar bg="dark" variant="dark" expand="sm" sticky="top">
+    <Navbar
+      style={{ backgroundColor: "#272822" }}
+      bg="dark"
+      variant="dark"
+      expand="sm"
+      sticky="top"
+    >
       <Container fluid>
         <Navbar.Collapse>
           {instance ? (
@@ -61,7 +70,7 @@ export default function TopBar() {
                 </NavDropdown.Item>
               </NavDropdown>
               <Nav.Item>
-                <select
+                <Select
                   style={dropdownStyle}
                   value={language || "plaintext"}
                   onChange={(event) => {
@@ -74,7 +83,7 @@ export default function TopBar() {
                       {value}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Nav.Item>
             </Nav>
           ) : (

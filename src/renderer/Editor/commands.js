@@ -4,26 +4,27 @@ import { collapseHome } from "@app/renderer/fileSystem";
 
 export function openFileCommand(editor) {
   console.log("C-x C-f");
-  const model = editor.getModel();
-  const cmdline = document.getElementById("command-line");
-
   const filename = document.getElementById("filename").innerHTML || "";
   console.log({ filename });
   if (filename.length > 0) {
-    cmdline.value = collapseHome(filename);
+    showCommandLine(collapseHome(filename), "path");
   } else {
-    cmdline.value = "~/";
+    showCommandLine("~/", "path");
   }
-  cmdline.style.visibility = "visible";
-  cmdline.focus();
 }
 export function openEmacsCommand(editor) {
   console.log("M-x");
-  const model = editor.getModel();
-  const cmdline = document.getElementById("command-line");
-  cmdline.style.visibility = "visible";
+  const cmdline = showCommandLine("", "command");
   cmdline.placeholder = "type command...";
-  cmdline.focus();
+}
+export function goToBufferStart(editor) {
+  editor.setPosition({ lineNumber: 0, column: 0 });
+}
+export function goToBufferEnd(editor) {
+  const model = editor.getModel();
+  const lineNumber = model.getLineCount();
+  const column = model.getLineLength(lineNumber);
+  editor.setPosition({ lineNumber, column: column + 1 });
 }
 
 export function hideCompletion() {
@@ -32,15 +33,22 @@ export function hideCompletion() {
   completionElement.innerHTML = "";
   return completionElement;
 }
-export function showCompletion(choices) {
+export function showCompletion(choices, isError = false) {
   const completionElement = document.getElementById("command-line-completion");
   const maxLength = Number.parseInt(completionElement.style.width || 80);
   console.log({ maxLength });
   completionElement.style.visibility = "visible";
   completionElement.innerHTML = choices
-    .join(", ")
+    ?.join(", ")
     .substring(0, maxLength * 1.8);
 
+  completionElement.style.backgroundColor = "#111";
+  completionElement.style.color = "#666";
+
+  if (isError) {
+    completionElement.style.backgroundColor = "#d00";
+    completionElement.style.color = "#fff";
+  }
   return completionElement;
 }
 export function hideCommandLine() {
@@ -49,9 +57,11 @@ export function hideCommandLine() {
   cmdline.value = "";
   return cmdline;
 }
-export function showCommandLine(value) {
+export function showCommandLine(value, commandType) {
   const cmdline = document.getElementById("command-line");
+  cmdline.setAttribute("data-type", commandType);
   cmdline.style.visibility = "visible";
   cmdline.value = value;
+  cmdline.focus();
   return cmdline;
 }

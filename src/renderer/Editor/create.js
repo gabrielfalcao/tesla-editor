@@ -1,14 +1,16 @@
 import * as monaco from "monaco-editor";
 import { setupEmacsNavigation } from "@app/renderer/Editor/navigation";
 import { createOverlayWidget } from "@app/renderer/Editor/Widget";
+import monokai from "monaco-themes/themes/Monokai.json";
 
 export const defaultOptions = {
-  theme: "vs-dark",
+  theme: "monokai",
   height: "100%",
   fontSize: "18px",
   scrollBeyondLastLine: false,
   width: "100%",
 };
+monaco.editor.defineTheme("monokai", monokai);
 
 export function createEditor(parentElement, options, context) {
   const editor = monaco.editor.create(parentElement, {
@@ -17,7 +19,7 @@ export function createEditor(parentElement, options, context) {
     language: undefined,
     value: "",
   });
-  const widget = createOverlayWidget({ ...context, instance: editor });
+  const widget = createOverlayWidget(context, editor);
   setupEmacsNavigation(editor);
   editor.addOverlayWidget(widget);
   window.addEventListener(
@@ -29,6 +31,7 @@ export function createEditor(parentElement, options, context) {
       editor.layoutWidget(widget);
     }
   );
-
+  const supportedActions = editor.getSupportedActions().map((a) => a.id);
+  console.log({ supportedActions });
   return editor;
 }

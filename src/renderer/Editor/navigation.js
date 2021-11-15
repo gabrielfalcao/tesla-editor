@@ -4,6 +4,8 @@ const { KeyMod, KeyCode } = monaco;
 import {
   openEmacsCommand,
   openFileCommand,
+  goToBufferStart,
+  goToBufferEnd,
 } from "@app/renderer/Editor/commands";
 
 export function getPreviousWordPosition(editor) {
@@ -89,7 +91,15 @@ export function getNextCharacterPosition(editor) {
   }
   return { lineNumber: range.endLineNumber, column: range.endColumn + 1 };
 }
-
+const selection = {
+  active: false,
+  range: {
+    endLineNumber: 0,
+    startLineNumber: 0,
+    startColumn: 0,
+    endColumn: 0,
+  },
+};
 export function setupEmacsNavigation(editor) {
   // Emacs Navigation Keybindings
   editor.addCommand(KeyMod.Alt | KeyCode.KeyB, () => {
@@ -104,14 +114,39 @@ export function setupEmacsNavigation(editor) {
   editor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyF, () => {
     editor.setPosition(getNextCharacterPosition(editor));
   });
+  editor.addCommand(KeyMod.Alt | KeyMod.Shift | KeyCode.Comma, () => {
+    goToBufferStart(editor);
+  });
   editor.addCommand(KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Comma, () => {
-    editor.setPosition({ lineNumber: 0, column: 0 });
+    goToBufferStart(editor);
+  });
+  editor.addCommand(KeyMod.Alt | KeyMod.Shift | KeyCode.Period, () => {
+    goToBufferEnd(editor);
   });
   editor.addCommand(KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Period, () => {
-    const model = editor.getModel();
-    const lineNumber = model.getLineCount();
-    const column = model.getLineLength(lineNumber);
-    editor.setPosition({ lineNumber, column: column + 1 });
+    goToBufferEnd(editor);
+  });
+  editor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.Space, () =>
+    alert("Gotcha")
+  );
+
+  /* editor.addCommand(KeyMod.WinCtrl | KeyCode.Space, () => {
+     * console.log("set selection");
+     * const position = editor.getPosition();
+     * selection.active = true;
+     * selection.range.startLineNumber = position.lineNumber;
+     * selection.range.endLineNumber = position.lineNumber;
+     * selection.range.startColumn = position.column;
+     * selection.range.endColumn = position.column;
+     * console.log(selection.range);
+     * editor.selection(selection.range);
+       }); */
+  editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyG, () => {
+    console.log("interrupt");
+  });
+  editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyS, () => {
+    console.log("find box");
+    editor.getAction("actions.find").run("");
   });
   editor.addCommand(
     monaco.KeyMod.chord(
@@ -120,6 +155,30 @@ export function setupEmacsNavigation(editor) {
     ),
     () => openFileCommand(editor)
   );
+  editor.addCommand(
+    KeyMod.chord(KeyMod.WinCtrl | KeyCode.KeyC, KeyCode.KeyU),
+    () => {
+      console.log("uncomment line");
+      editor.getAction("editor.action.removeCommentLine").run("");
+    }
+  );
+  editor.addCommand(KeyMod.WinCtrl | KeyMod.Shift | KeyCode.Digit3, () => {
+    console.log("comment line");
+    editor.getAction("editor.action.commentLine").run("");
+  });
+  editor.addCommand(KeyMod.WinCtrl | KeyMod.Shift | KeyCode.KeyR, () => {
+    console.log("run command");
+    editor.getAction("editor.action.quickCommand").run("");
+  });
+  editor.addCommand(KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KeyR, () => {
+    console.log("run command");
+    editor.getAction("editor.action.quickCommand").run("");
+  });
+  editor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyR, () => {
+    console.log("run command");
+    editor.getAction("editor.action.quickCommand").run("");
+  });
+
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () =>
     openEmacsCommand(editor)
   );

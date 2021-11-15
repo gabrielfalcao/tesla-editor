@@ -1,4 +1,5 @@
 import React, { useContext, createContext, useState } from "react";
+import * as fs from "fs";
 import { ipcRenderer } from "electron";
 
 import { loadCodeForMonaco, writeFile } from "@app/renderer/fileSystem";
@@ -28,12 +29,12 @@ export function useEditorProvider() {
   const [code, setCode] = useState(defaultCode);
   const [instance, setInstance] = useState(null);
 
-  function openFile(filename) {
-    instance.getModel().dispose();
+  function openFile(filename, editor = instance) {
+    (editor || instance).getModel()?.dispose();
     const model = loadCodeForMonaco(filename);
     const detectedLanguage = model.getLanguageId();
 
-    instance.setModel(model);
+    editor.setModel(model);
     setCode({
       filename: filename,
       content: model.getValue(),
@@ -48,12 +49,12 @@ export function useEditorProvider() {
       if (hasChanged) {
         if (!dirty) {
           setDirty(true);
-          instance.focus();
+          editor.focus();
         }
       }
     });
     console.log("openFile", { filename, detectedLanguage });
-    instance.focus();
+    (editor || instance)?.focus();
     return model;
   }
   if (instance) {
@@ -62,6 +63,7 @@ export function useEditorProvider() {
     });
     ipcRenderer.on("save-file", () => {
       writeFile(code.filename, instance.getModel().getValue());
+      setDirty(false);
     });
   }
   function updateOptions(opts) {

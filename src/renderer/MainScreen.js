@@ -64,6 +64,7 @@ const Image = styled.img`
 `;
 const Overlay = styled.div`
   background: #333;
+  position: absolute;
   z-index: 10000;
   text-align: center;
 `;
@@ -86,7 +87,8 @@ export default function MainScreen() {
   const { instance } = useEditor();
   return (
     <Main>
-      {instance ? <TopBar /> : <Splash />}
+      {/* {instance ? <TopBar /> : <Splash />} */}
+      <TopBar />
       <Editor />
     </Main>
   );
