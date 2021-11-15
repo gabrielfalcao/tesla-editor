@@ -6,6 +6,8 @@ import {
   openFileCommand,
   goToBufferStart,
   goToBufferEnd,
+  hideCompletion,
+  hideCommandLine,
 } from "@app/renderer/Editor/commands";
 
 export function getPreviousWordPosition(editor) {
@@ -152,6 +154,8 @@ export function setupEmacsNavigation(context, editor) {
   });
   editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyG, () => {
     console.log("interrupt");
+    hideCompletion();
+    hideCommandLine();
   });
   editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyS, () => {
     console.log("find box");
