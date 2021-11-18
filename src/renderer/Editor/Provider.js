@@ -9,7 +9,7 @@ export const EditorContext = createContext();
 export const defaultCode = {
   filename: undefined,
   content: undefined,
-  language: undefined
+  language: undefined,
 };
 
 export function EditorProvider({ children }) {
@@ -41,7 +41,7 @@ export function useEditorProvider() {
     setCode({
       filename: filename,
       content: model.getValue(),
-      language: detectedLanguage
+      language: detectedLanguage,
     });
     setDirty(false);
     setLanguage(detectedLanguage);
@@ -105,6 +105,6 @@ export function useEditorProvider() {
 
     openFile,
     saveFile,
-    updateOptions
+    updateOptions,
   };
 }

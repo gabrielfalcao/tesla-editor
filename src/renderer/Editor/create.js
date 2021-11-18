@@ -8,7 +8,7 @@ export const defaultOptions = {
   height: "100%",
   fontSize: "18px",
   scrollBeyondLastLine: false,
-  width: "100%"
+  width: "100%",
 };
 monaco.editor.defineTheme("monokai", monokai);
 
@@ -17,7 +17,7 @@ export function createEditor(parentElement, options, context) {
     ...defaultOptions,
     ...options,
     language: undefined,
-    value: ""
+    value: "",
   });
   const widget = createOverlayWidget(context, editor);
   setupEmacsNavigation(context, editor);
@@ -31,7 +31,7 @@ export function createEditor(parentElement, options, context) {
       //editor.layoutWidget(widget);
     }
   );
-  const supportedActions = editor.getSupportedActions().map(a => a.id);
+  const supportedActions = editor.getSupportedActions().map((a) => a.id);
   console.log({ supportedActions });
   return editor;
 }

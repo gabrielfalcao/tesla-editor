@@ -10,7 +10,7 @@ import {
   hideCommandLine,
   showCommandLine,
   hideCompletion,
-  showCompletion
+  showCompletion,
 } from "@app/renderer/Editor/commands";
 
 function getParentHeight() {
@@ -19,7 +19,7 @@ function getParentHeight() {
 function getParentWidth() {
   return Number.parseInt(window.innerWidth);
 }
-const INTERNAL_COMMANDS = ["find-file", "save-buffer", "revert-buffer"];
+const INTERNAL_COMMANDS = ["open-file", "save-file", "revert-buffer"];
 const containerStyle = css`
   height: 28px;
   overflow: hidden;
@@ -97,7 +97,7 @@ export function loadPathFromCommandLine() {
     filename,
     stat,
     inputElement,
-    commandType
+    commandType,
   };
 }
 export function executeInternalCommand(context, editor) {
@@ -109,6 +109,9 @@ export function executeInternalCommand(context, editor) {
     case "save":
     case "save-file":
       saveFile(code.filename, editor);
+      return hideCommandLine();
+    case "revert-buffer":
+      openFile(code.filename, editor);
       return hideCommandLine();
     case "open":
     case "open-file":
@@ -142,20 +145,14 @@ export function doOpenFile({ openFile }, editor) {
 export function autoComplete(e) {
   const completionElement = document.getElementById("command-line-completion");
 
-  const {
-    stat,
-    target,
-    directory,
-    filename,
-    inputElement,
-    commandType
-  } = loadPathFromCommandLine();
+  const { stat, target, directory, filename, inputElement, commandType } =
+    loadPathFromCommandLine();
   let choices = [];
-  if (commandType === "path") {
+  if (commandType === "open-file") {
     if (fs.existsSync(directory)) {
       choices = fs
         .readdirSync(directory)
-        .filter(f => f.startsWith(filename) && f !== filename);
+        .filter((f) => f.startsWith(filename) && f !== filename);
     } else if (stat.isDirectory()) {
       choices = fs.readdirSync(target);
     } else if (filename.length === 0) {
@@ -165,7 +162,10 @@ export function autoComplete(e) {
 
     if (choices.length === 1) {
       hideCompletion();
-      showCommandLine(collapseHome(path.join(directory, choices[0])), "path");
+      showCommandLine(
+        collapseHome(path.join(directory, choices[0])),
+        "open-file"
+      );
     } else if (choices.length > 1) {
       showCompletion(choices);
     } else {
@@ -173,7 +173,7 @@ export function autoComplete(e) {
     }
   } else {
     choices = INTERNAL_COMMANDS.filter(
-      cmd => cmd.indexOf(inputElement.value) !== -1
+      (cmd) => cmd.indexOf(inputElement.value) !== -1
     );
     showCompletion(choices);
   }
@@ -200,7 +200,7 @@ export function Widget({ editor, ...props }) {
         e.preventDefault();
         return false;
       case 13: // Enter
-        if (commandType === "path") {
+        if (commandType === "open-file") {
           doOpenFile(context, editor);
         } else {
           executeInternalCommand(context, editor);
@@ -245,6 +245,6 @@ export function createOverlayWidget(context, editor) {
     },
     getPosition() {
       return null;
-    }
+    },
   };
 }
