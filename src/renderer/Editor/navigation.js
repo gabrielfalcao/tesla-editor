@@ -6,6 +6,8 @@ import {
   openFileCommand,
   goToBufferStart,
   goToBufferEnd,
+  hideCompletion,
+  hideCommandLine
 } from "@app/renderer/Editor/commands";
 
 export function getPreviousWordPosition(editor) {
@@ -16,7 +18,7 @@ export function getPreviousWordPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column - 1,
-    endColumn: column,
+    endColumn: column
   };
   if (range.startColumn <= 0) {
     if (lineNumber > 0) {
@@ -39,7 +41,7 @@ export function getNextWordPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column,
-    endColumn: column + 1,
+    endColumn: column + 1
   };
   const lineLength = model.getLineLength(lineNumber);
   if (column - 1 === lineLength) {
@@ -64,7 +66,7 @@ export function getPreviousCharacterPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column - 1,
-    endColumn: column,
+    endColumn: column
   };
   if (range.startColumn < 0) {
     if (lineNumber > 1) {
@@ -81,7 +83,7 @@ export function getNextCharacterPosition(editor) {
     endLineNumber: lineNumber,
     startLineNumber: lineNumber,
     startColumn: column,
-    endColumn: column + 1,
+    endColumn: column + 1
   };
   while (/^\w+$/.test(model.getValueInRange(range))) {
     range.endColumn += 1;
@@ -97,8 +99,8 @@ const selection = {
     endLineNumber: 0,
     startLineNumber: 0,
     startColumn: 0,
-    endColumn: 0,
-  },
+    endColumn: 0
+  }
 };
 export function setupEmacsNavigation(context, editor) {
   const { saveFile } = context;
@@ -152,6 +154,8 @@ export function setupEmacsNavigation(context, editor) {
   });
   editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyG, () => {
     console.log("interrupt");
+    hideCompletion();
+    hideCommandLine();
   });
   editor.addCommand(KeyMod.WinCtrl | KeyCode.KeyS, () => {
     console.log("find box");
@@ -190,10 +194,14 @@ export function setupEmacsNavigation(context, editor) {
   editor.addCommand(
     KeyMod.chord(KeyMod.WinCtrl | KeyMod.KeyX, KeyMod.WinCtrl | KeyCode.KeyS),
     () => {
-      console.log("save file");
+      console.log("save file C-x C-s");
       saveFile();
     }
   );
+  editor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyS, () => {
+    console.log("save file Cmd+S");
+    saveFile();
+  });
 
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () =>
     openEmacsCommand(editor)
