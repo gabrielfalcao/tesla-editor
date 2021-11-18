@@ -9,7 +9,7 @@ export const EditorContext = createContext();
 export const defaultCode = {
   filename: undefined,
   content: undefined,
-  language: undefined,
+  language: undefined
 };
 
 export function EditorProvider({ children }) {
@@ -26,19 +26,22 @@ export function useEditor() {
 export function useEditorProvider() {
   const [language, setLanguage] = useState(undefined);
   const [dirty, setDirty] = useState(false);
+  const [filename, setFilename] = useState(null);
   const [code, setCode] = useState(defaultCode);
   const [instance, setInstance] = useState(null);
 
-  function openFile(filename, editor = instance) {
+  function openFile(filename = code?.filename, editor = instance) {
+    console.log(`opening file: ${filename}`);
     (editor || instance).getModel()?.dispose();
     const model = loadCodeForMonaco(filename);
     const detectedLanguage = model.getLanguageId();
 
     editor.setModel(model);
+    setFilename(filename);
     setCode({
       filename: filename,
       content: model.getValue(),
-      language: detectedLanguage,
+      language: detectedLanguage
     });
     setDirty(false);
     setLanguage(detectedLanguage);
@@ -61,12 +64,13 @@ export function useEditorProvider() {
     ipcRenderer.on("open-file", (_, filename) => {
       openFile(filename);
     });
-    ipcRenderer.on("save-file", () => {
-      saveFile();
+    ipcRenderer.on("save-file", (_, filename) => {
+      saveFile(filename);
     });
   }
-  function saveFile() {
-    writeFile(code.filename, instance.getModel().getValue());
+  function saveFile(filename = code?.filename, editor = instance) {
+    console.log(`saving file: ${filename}`);
+    writeFile(filename, editor.getModel().getValue());
     setDirty(false);
   }
   function updateOptions(opts) {
@@ -101,6 +105,6 @@ export function useEditorProvider() {
 
     openFile,
     saveFile,
-    updateOptions,
+    updateOptions
   };
 }

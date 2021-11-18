@@ -8,10 +8,11 @@ const {
   MenuItem,
   nativeImage,
   BrowserWindow,
-  ipcMain,
+  ipcMain
 } = require("electron");
 
 import * as path from "path";
+import * as fs from "fs";
 
 import { format as formatUrl } from "url";
 
@@ -30,8 +31,8 @@ function createMainWindow() {
     height: 960,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
-    },
+      enableRemoteModule: true
+    }
   });
 
   if (isDevelopment) {
@@ -45,7 +46,7 @@ function createMainWindow() {
       formatUrl({
         pathname: path.join(__dirname, "index.html"),
         protocol: "file",
-        slashes: true,
+        slashes: true
       })
     );
   }
@@ -91,15 +92,15 @@ app.on("ready", () => {
         if (!mainWindow) {
           mainWindow = createMainWindow();
         }
-      },
+      }
     },
     {
       label: "Quit",
       type: "normal",
       click() {
         process.exit(0);
-      },
-    },
+      }
+    }
   ]);
 
   tray.setToolTip("Tesla Editor");
@@ -107,13 +108,13 @@ app.on("ready", () => {
 
   mainWindow = createMainWindow();
 });
-app.on("will-quit", (event) => {
+app.on("will-quit", event => {
   if (
     dialog.showMessageBoxSync(mainWindow, {
       type: "question",
       title: "Tesla Editor",
       message: "Are you sure you want to quit?",
-      buttons: ["Yes", "No"],
+      buttons: ["Yes", "No"]
     }) === 1
   ) {
     event.preventDefault();
@@ -142,43 +143,59 @@ menu.append(
           if (!mainWindow) {
             mainWindow = createMainWindow();
           }
-        },
+        }
       },
       {
         role: "save",
         label: "Save",
         accelerator: process.platform === "darwin" ? "Cmd+S" : "Ctrl+S",
         click: () => {
-          mainWindow.webContents.send("save-file");
-        },
+          const result = dialog.showSaveDialogSync(mainWindow, {
+            title: "Save a file",
+            message: "binary files are not supported",
+            defaultPath: path.resolve(__dirname, "../.."),
+            properties: ["saveFile", "showHiddenFiles"]
+          });
+          if (!result) {
+            return;
+          }
+          const [filename] = result;
+          if (fs.existsSync(filename)) {
+            mainWindow.webContents.send("save-file", filename);
+          }
+        }
       },
       {
         role: "open",
         label: "Open",
         accelerator: process.platform === "darwin" ? "Cmd+O" : "Ctrl+O",
         click: () => {
-          const [filename] = dialog.showOpenDialogSync(mainWindow, {
+          const result = dialog.showOpenDialogSync(mainWindow, {
             title: "Open a file",
             message: "binary files are not supported",
             defaultPath: path.resolve(__dirname, "../.."),
-            properties: ["openFile", "showHiddenFiles"],
+            properties: ["openFile", "showHiddenFiles"]
           });
-          if (filename) {
+          if (!result) {
+            return;
+          }
+          const [filename] = result;
+          if (fs.existsSync(filename)) {
             loadFileIntoRenderer(filename);
           }
-        },
+        }
       },
       {
         role: "close",
         label: "Close",
-        accelerator: process.platform === "darwin" ? "Cmd+W" : "Ctrl+W",
+        accelerator: process.platform === "darwin" ? "Cmd+W" : "Ctrl+W"
       },
       {
         role: "quit",
         label: "Quit",
-        accelerator: process.platform === "darwin" ? "Cmd+Q" : "Alt+F4",
-      },
-    ],
+        accelerator: process.platform === "darwin" ? "Cmd+Q" : "Alt+F4"
+      }
+    ]
   })
 );
 

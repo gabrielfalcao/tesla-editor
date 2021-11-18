@@ -7,9 +7,9 @@ export function openFileCommand(editor) {
   const filename = document.getElementById("filename").innerHTML || "";
   console.log({ filename });
   if (filename.length > 0) {
-    showCommandLine(collapseHome(filename), "path");
+    showCommandLine(collapseHome(filename), "open-file");
   } else {
-    showCommandLine("~/", "path");
+    showCommandLine("~/", "open-file");
   }
 }
 export function openEmacsCommand(editor) {
@@ -52,6 +52,7 @@ export function showCompletion(choices, isError = false) {
   return completionElement;
 }
 export function hideCommandLine() {
+  hideCompletion();
   const cmdline = document.getElementById("command-line");
   cmdline.style.visibility = "hidden";
   cmdline.value = "";

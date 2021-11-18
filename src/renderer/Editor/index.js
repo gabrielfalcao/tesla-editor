@@ -15,11 +15,11 @@ export default function Editor({ ...options }) {
   const { setInstance, instance } = context;
   Object.defineProperty(window, "editorContext", {
     value: context,
-    writable: true,
+    writable: true
   });
   Object.defineProperty(window, "editorInstance", {
     value: instance,
-    writable: true,
+    writable: true
   });
 
   window.editorContext = context;
@@ -28,6 +28,8 @@ export default function Editor({ ...options }) {
       setInstance(
         createEditor(document.getElementById("monaco-parent"), options, context)
       );
+    } else {
+      instance.teslaContext = context;
     }
   });
 

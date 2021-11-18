@@ -10,7 +10,7 @@ import {
   hideCommandLine,
   showCommandLine,
   hideCompletion,
-  showCompletion,
+  showCompletion
 } from "@app/renderer/Editor/commands";
 
 function getParentHeight() {
@@ -97,16 +97,34 @@ export function loadPathFromCommandLine() {
     filename,
     stat,
     inputElement,
-    commandType,
+    commandType
   };
 }
 export function executeInternalCommand(context, editor) {
+  const { saveFile, openFile, code } = context;
   const inputElement = document.getElementById("command-line");
-  const command = `${inputElement.value}`;
-  if (command.length > 0) {
-    showCompletion([`The command "${command}" is not implemented yet`], true);
-  } else {
-    showCompletion([`empty command`], true);
+  const [command, ...args] = `${inputElement.value}`.split();
+  console.log("internal command", { command, args });
+  switch (command) {
+    case "save":
+    case "save-file":
+      saveFile(code.filename, editor);
+      return hideCommandLine();
+    case "open":
+    case "open-file":
+      openFile(args[0], editor);
+      return hideCommandLine();
+
+    default:
+      if (command.length > 0) {
+        showCompletion(
+          [`The command "${command}" is not implemented yet`],
+          true
+        );
+      } else {
+        showCompletion([`empty command`], true);
+      }
+      break;
   }
   setTimeout(() => hideCompletion(), Math.PI * 1000);
 }
@@ -124,14 +142,20 @@ export function doOpenFile({ openFile }, editor) {
 export function autoComplete(e) {
   const completionElement = document.getElementById("command-line-completion");
 
-  const { stat, target, directory, filename, inputElement, commandType } =
-    loadPathFromCommandLine();
+  const {
+    stat,
+    target,
+    directory,
+    filename,
+    inputElement,
+    commandType
+  } = loadPathFromCommandLine();
   let choices = [];
   if (commandType === "path") {
     if (fs.existsSync(directory)) {
       choices = fs
         .readdirSync(directory)
-        .filter((f) => f.startsWith(filename) && f !== filename);
+        .filter(f => f.startsWith(filename) && f !== filename);
     } else if (stat.isDirectory()) {
       choices = fs.readdirSync(target);
     } else if (filename.length === 0) {
@@ -149,13 +173,16 @@ export function autoComplete(e) {
     }
   } else {
     choices = INTERNAL_COMMANDS.filter(
-      (cmd) => cmd.indexOf(inputElement.value) !== -1
+      cmd => cmd.indexOf(inputElement.value) !== -1
     );
     showCompletion(choices);
   }
 }
-export function Widget({ context, editor }) {
+export function Widget({ editor, ...props }) {
   function onKeyDown(e) {
+    const context = props?.context?.instance
+      ? props.context
+      : editor.teslaContext;
     const inputElement = document.getElementById("command-line");
     const commandType = inputElement.getAttribute("data-type");
     switch (e.keyCode) {
@@ -186,7 +213,7 @@ export function Widget({ context, editor }) {
   }
   return (
     <div id="command-line-widget" css={containerStyle}>
-      <Completion id="command-line-completion"></Completion>
+      <Completion id="command-line-completion" />
       <CommandLine id="command-line" type="text" onKeyDown={onKeyDown} />
     </div>
   );
@@ -218,6 +245,6 @@ export function createOverlayWidget(context, editor) {
     },
     getPosition() {
       return null;
-    },
+    }
   };
 }

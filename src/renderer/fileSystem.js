@@ -11,11 +11,7 @@ export function resolveHome(filepath) {
 }
 
 export function writeFile(filename, content) {
-  const fd = fs.openSync(resolveHome(filename), "w");
-  const bytes = fs.writeSync(fd, content);
-  fs.closeSync(fd);
-  console.log(`wrote ${filename}: ${bytes}`);
-  return bytes;
+  fs.writeFileSync(resolveHome(filename), content);
 }
 
 export function readFile(filename) {
@@ -34,4 +30,4 @@ export function loadCodeForMonaco(filename, language) {
   return model;
 }
 
-export const collapseHome = (t) => t.replace(os.homedir(), "~");
+export const collapseHome = t => t.replace(os.homedir(), "~");
