@@ -107,9 +107,10 @@ app.on("ready", () => {
   tray.setContextMenu(contextMenu);
 
   mainWindow = createMainWindow();
-  if (process.argv[1]) {
-    mainWindow.webContents.send("open-file", process.argv[1]);
-  }
+});
+app.on("open-file", (event, filePath) => {
+  mainWindow = createMainWindow();
+  mainWindow.webContents.send("open-file", path);
 });
 app.on("will-quit", (event) => {
   if (
