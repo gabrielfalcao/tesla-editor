@@ -107,6 +107,9 @@ app.on("ready", () => {
   tray.setContextMenu(contextMenu);
 
   mainWindow = createMainWindow();
+  if (process.argv[1]) {
+    mainWindow.webContents.send("open-file", process.argv[1]);
+  }
 });
 app.on("will-quit", (event) => {
   if (
