@@ -108,6 +108,10 @@ app.on("ready", () => {
 
   mainWindow = createMainWindow();
 });
+app.on("open-file", (event, filePath) => {
+  mainWindow = createMainWindow();
+  mainWindow.webContents.send("open-file", path);
+});
 app.on("will-quit", (event) => {
   if (
     dialog.showMessageBoxSync(mainWindow, {
