@@ -1,17 +1,13 @@
 # Tesla Editor
 
-
-
-
+![screenshot.png](screencast.mp4)
 A simple editor powered by [Electron](https://www.electronjs.org/), [react](https://reactjs.org/) and [Monaco Editor](https://microsoft.github.io/monaco-editor/)
-
 
 * Built with [electron-webpack](https://webpack.electron.build/)
 * Use [`webpack-dev-server`](https://github.com/webpack/webpack-dev-server) for development
 * Hot Module Reloading for both `renderer` and `main` processes
 * Auto configures [`babel-preset-env`](https://github.com/babel/babel-preset-env) based on the `electron` version
 * Use [`electron-builder`](https://github.com/electron-userland/electron-builder) to package and build a distributable electron application.
-
 
 ## Getting Started
 
