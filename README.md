@@ -1,6 +1,7 @@
 # Tesla Editor
 
-![./screenshot.png](./screencast.mp4)
+[![Screencast](https://github.com/gabrielfalcao/tesla-editor/raw/main/screenshot.png)](https://github.com/gabrielfalcao/tesla-editor/raw/main/screencast.mp4)
+![https://github.com/gabrielfalcao/tesla-editor/raw/main/screencast.mp4](https://github.com/gabrielfalcao/tesla-editor/raw/main/screencast.mp4)
 A simple editor powered by [Electron](https://www.electronjs.org/), [react](https://reactjs.org/) and [Monaco Editor](https://microsoft.github.io/monaco-editor/)
 
 * Built with [electron-webpack](https://webpack.electron.build/)
